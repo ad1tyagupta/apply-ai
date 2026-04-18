@@ -2,7 +2,7 @@
 
 ApplyAI is a Codex-first workspace for job-search operations. It helps a user onboard their career documents, convert them into Markdown, build a source-backed profile wiki, generate target-role and company recommendations, scan live jobs, score those jobs against a chosen search style, and prepare factual application assets.
 
-ApplyAI was inspired by CareerOps and LLM Wiki, but designed as a distinct Codex-first workflow focused on source-backed profile building, structured job discovery, and factual application materials.
+ApplyAI was inspired by [Career Ops](https://github.com/santifer/career-ops) and [LLM Wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f), but designed as a distinct Codex-first workflow focused on source-backed profile building, structured job discovery, and factual application materials.
 
 ## What ApplyAI Does
 
