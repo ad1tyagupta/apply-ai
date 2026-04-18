@@ -22,6 +22,8 @@ These files summarize the user without becoming a new source of truth.
 
 - `config/user-preferences.yml`
 - `config/profile.yml`
+- `profile/facts.yml`
+- `profile/recommendations.yml`
 - `profile/master-profile.md`
 - `profile/role-map.md`
 - `profile/cv-strategy.md`
@@ -57,3 +59,12 @@ These files are safe to regenerate at any time.
 - `modes/*`
 - `AGENTS.md`
 - `README.md`
+
+## Public And Private Workspaces
+
+The public repository should stay generic and safe to publish.
+
+- public template workspace: `apply-ai`
+- recommended private working workspace: `apply-ai-private`
+
+Real user uploads, active tracker state, and personal outputs should live in the private working copy when the user wants a public-safe setup.

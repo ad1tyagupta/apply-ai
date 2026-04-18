@@ -1,3 +1,6 @@
 # Target Companies
 
-Record the accepted and user-added company targets here after onboarding.
+Use recommendations plus user confirmation before searching live jobs.
+
+## Source Documents
+- No source manifests found yet.

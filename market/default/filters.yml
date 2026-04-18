@@ -8,8 +8,8 @@ hard_stops:
 
 scoring_defaults:
   broad: 60
-  balanced: 75
-  highly_selective: 90
+  balanced: 60
+  highly_selective: 85
 
 scoring_dimensions:
   - "role-fit"

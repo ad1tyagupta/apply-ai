@@ -20,7 +20,7 @@ test("buildPortalsConfig merges preferences with accepted companies and role key
       customCompanies: [
         {
           name: "User Added",
-          careers_url: "https://jobs.ashbyhq.com/user-added",
+          careers_url: "https://careers.user-added.example/jobs",
         },
       ],
     },
@@ -53,10 +53,11 @@ test("buildPortalsConfig merges preferences with accepted companies and role key
   });
 
   assert.deepEqual(config.location_filter.include, ["Germany", "Berlin", "Remote", "Hybrid"]);
-  assert.equal(config.tracked_companies.length, 2);
+  assert.equal(config.tracked_companies.length, 1);
   assert.equal(config.tracked_companies[0].name, "Notion");
-  assert.equal(config.tracked_companies[1].name, "User Added");
-  assert.equal(config.search_queries.length, 1);
+  assert.equal(config.discovery_backlog.length, 1);
+  assert.equal(config.discovery_backlog[0].name, "User Added");
+  assert.equal(config.search_queries.length, 2);
   assert.match(config.search_queries[0].query, /Germany OR Berlin/);
   assert.match(config.search_queries[0].query, /Product Marketing/);
 });

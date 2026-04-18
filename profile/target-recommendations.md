@@ -2,45 +2,45 @@
 
 ## Role Families
 
-- Growth Marketing — Matched role signals from target roles: Product Marketing, Growth Marketing
-- Product Marketing — Matched role signals from target roles: Product Marketing, Growth Marketing
-- Marketing Operations — Matched role signals from target roles: Product Marketing, Growth Marketing
-- Business Operations — Matched role signals from target roles: Product Marketing, Growth Marketing
-- Commercial Strategy — Matched role signals from target roles: Product Marketing, Growth Marketing
-- Marketing Analytics — Matched role signals from target roles: Product Marketing, Growth Marketing
-- AI Strategy — Matched role signals from target roles: Product Marketing, Growth Marketing
-- Lifecycle Marketing — Matched role signals from target roles: Product Marketing, Growth Marketing
-- Revenue Operations — Matched role signals from target roles: Product Marketing, Growth Marketing
-- Community — Matched role signals from target roles: Product Marketing, Growth Marketing
-- Partnerships — Matched role signals from target roles: Product Marketing, Growth Marketing
-- Program Management — Matched role signals from target roles: Product Marketing, Growth Marketing
+- Growth Marketing (80%) — Matched confirmed roles: Product Marketing, Growth Marketing, Growth.
+- Product Marketing (80%) — Matched confirmed roles: Product Marketing, Growth Marketing, Growth.
+- Marketing Operations (36%) — Matched starter defaults.
+- Business Operations (32%) — Matched starter defaults.
+- Commercial Strategy (32%) — Matched starter defaults.
+- Marketing Analytics (32%) — Matched starter defaults.
+- AI Strategy (28%) — Matched starter defaults.
+- Lifecycle Marketing (28%) — Matched starter defaults.
+- Revenue Operations (28%) — Matched starter defaults.
+- Community (24%) — Matched starter defaults.
+- Partnerships (24%) — Matched starter defaults.
+- Program Management (24%) — Matched starter defaults.
 
 ## Companies
 
-- OpenAI — Matched industries, stages, and role fit from your profile for OpenAI.
-- Airtable — Matched industries, stages, and role fit from your profile for Airtable.
-- Amplitude — Matched industries, stages, and role fit from your profile for Amplitude.
-- Anthropic — Matched industries, stages, and role fit from your profile for Anthropic.
-- Atlassian — Matched industries, stages, and role fit from your profile for Atlassian.
-- Canva — Matched industries, stages, and role fit from your profile for Canva.
-- Cohere — Matched industries, stages, and role fit from your profile for Cohere.
-- Figma — Matched industries, stages, and role fit from your profile for Figma.
-- HubSpot — Matched industries, stages, and role fit from your profile for HubSpot.
-- Intercom — Matched industries, stages, and role fit from your profile for Intercom.
-- LangChain — Matched industries, stages, and role fit from your profile for LangChain.
-- Linear — Matched industries, stages, and role fit from your profile for Linear.
-- Miro — Matched industries, stages, and role fit from your profile for Miro.
-- Mistral AI — Matched industries, stages, and role fit from your profile for Mistral AI.
-- n8n — Matched industries, stages, and role fit from your profile for n8n.
-- Notion — Matched industries, stages, and role fit from your profile for Notion.
-- Personio — Matched industries, stages, and role fit from your profile for Personio.
-- Plaid — Matched industries, stages, and role fit from your profile for Plaid.
-- Retool — Matched industries, stages, and role fit from your profile for Retool.
-- Rippling — Matched industries, stages, and role fit from your profile for Rippling.
-- Stripe — Matched industries, stages, and role fit from your profile for Stripe.
-- Vercel — Matched industries, stages, and role fit from your profile for Vercel.
-- Webflow — Matched industries, stages, and role fit from your profile for Webflow.
-- Zapier — Matched industries, stages, and role fit from your profile for Zapier.
-- GitHub — Matched industries, stages, and role fit from your profile for GitHub.
+- Amplitude (60%) — Matched industries, stages, and role fit from your profile for Amplitude.
+- Canva (60%) — Matched industries, stages, and role fit from your profile for Canva.
+- Figma (60%) — Matched industries, stages, and role fit from your profile for Figma.
+- HubSpot (60%) — Matched industries, stages, and role fit from your profile for HubSpot.
+- Miro (60%) — Matched industries, stages, and role fit from your profile for Miro.
+- n8n (60%) — Matched industries, stages, and role fit from your profile for n8n.
+- Notion (60%) — Matched industries, stages, and role fit from your profile for Notion.
+- Personio (60%) — Matched industries, stages, and role fit from your profile for Personio.
+- Retool (60%) — Matched industries, stages, and role fit from your profile for Retool.
+- Vercel (60%) — Matched industries, stages, and role fit from your profile for Vercel.
+- Webflow (60%) — Matched industries, stages, and role fit from your profile for Webflow.
+- Zapier (60%) — Matched industries, stages, and role fit from your profile for Zapier.
+- OpenAI (50%) — Matched industries, stages, and role fit from your profile for OpenAI.
+- Wise (50%) — Matched industries, stages, and role fit from your profile for Wise.
+- Airtable (40%) — Matched industries, stages, and role fit from your profile for Airtable.
+- Anthropic (40%) — Matched industries, stages, and role fit from your profile for Anthropic.
+- Atlassian (40%) — Matched industries, stages, and role fit from your profile for Atlassian.
+- Cohere (40%) — Matched industries, stages, and role fit from your profile for Cohere.
+- Deel (40%) — Matched industries, stages, and role fit from your profile for Deel.
+- Intercom (40%) — Matched industries, stages, and role fit from your profile for Intercom.
+- LangChain (40%) — Matched industries, stages, and role fit from your profile for LangChain.
+- Linear (40%) — Matched industries, stages, and role fit from your profile for Linear.
+- Mistral AI (40%) — Matched industries, stages, and role fit from your profile for Mistral AI.
+- Plaid (40%) — Matched industries, stages, and role fit from your profile for Plaid.
+- Rippling (40%) — Matched industries, stages, and role fit from your profile for Rippling.
 
-Review these with the user and copy accepted companies into `config/user-preferences.yml`.
+Review these with the user. Confirm final choices in `config/user-preferences.yml`; keep generated suggestions in `profile/recommendations.yml`.

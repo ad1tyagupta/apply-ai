@@ -2,6 +2,11 @@ onboarding:
   completed: false
   last_completed_step: "not-started"
 
+workspace:
+  mode: "public-template"
+  recommendedPrivateWorkspace: "../apply-ai-private"
+  keepPersonalDataPrivate: true
+
 geography:
   countries: []
   cities: []
@@ -29,3 +34,5 @@ documents:
   rawDir: "intake/raw"
   normalizedDir: "intake/normalized"
   wikiDir: "profile/wiki"
+  factsPath: "profile/facts.yml"
+  recommendationsPath: "profile/recommendations.yml"

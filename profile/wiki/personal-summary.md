@@ -2,6 +2,10 @@
 
 Use this page as the concise candidate overview during evaluation and document drafting.
 
+## Contact
+
+## Role Signals
+
 ## Source Documents
 - No source manifests found yet.
 

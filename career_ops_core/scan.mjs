@@ -17,6 +17,7 @@
 
 import { readFileSync, writeFileSync, appendFileSync, existsSync, mkdirSync } from 'fs';
 import yaml from 'js-yaml';
+import { detectApi } from './lib/discovery.mjs';
 const parseYaml = yaml.load;
 
 // ── Config ──────────────────────────────────────────────────────────
@@ -31,46 +32,6 @@ mkdirSync('data', { recursive: true });
 
 const CONCURRENCY = 10;
 const FETCH_TIMEOUT_MS = 10_000;
-
-// ── API detection ───────────────────────────────────────────────────
-
-function detectApi(company) {
-  // Greenhouse: explicit api field
-  if (company.api && company.api.includes('greenhouse')) {
-    return { type: 'greenhouse', url: company.api };
-  }
-
-  const url = company.careers_url || '';
-
-  // Ashby
-  const ashbyMatch = url.match(/jobs\.ashbyhq\.com\/([^/?#]+)/);
-  if (ashbyMatch) {
-    return {
-      type: 'ashby',
-      url: `https://api.ashbyhq.com/posting-api/job-board/${ashbyMatch[1]}?includeCompensation=true`,
-    };
-  }
-
-  // Lever
-  const leverMatch = url.match(/jobs\.lever\.co\/([^/?#]+)/);
-  if (leverMatch) {
-    return {
-      type: 'lever',
-      url: `https://api.lever.co/v0/postings/${leverMatch[1]}`,
-    };
-  }
-
-  // Greenhouse EU boards
-  const ghEuMatch = url.match(/job-boards(?:\.eu)?\.greenhouse\.io\/([^/?#]+)/);
-  if (ghEuMatch && !company.api) {
-    return {
-      type: 'greenhouse',
-      url: `https://boards-api.greenhouse.io/v1/boards/${ghEuMatch[1]}/jobs`,
-    };
-  }
-
-  return null;
-}
 
 // ── API parsers ─────────────────────────────────────────────────────
 
@@ -278,6 +239,8 @@ async function main() {
 
   const config = parseYaml(readFileSync(PORTALS_PATH, 'utf-8'));
   const companies = config.tracked_companies || [];
+  const searchQueries = config.search_queries || [];
+  const discoveryBacklog = config.discovery_backlog || [];
   const titleFilter = buildTitleFilter(config.title_filter);
   const locationFilter = buildLocationFilter(config.location_filter);
 
@@ -289,6 +252,20 @@ async function main() {
     .filter(c => c._api !== null);
 
   const skippedCount = companies.filter(c => c.enabled !== false).length - targets.length;
+
+  if (targets.length === 0) {
+    if (discoveryBacklog.length > 0 || searchQueries.length > 0) {
+      const queryLabel = searchQueries.length === 1 ? "query" : "queries";
+      const companyLabel = discoveryBacklog.length === 1 ? "company" : "companies";
+      console.error('Error: no locally scannable companies are available in portals.yml.');
+      console.error(`Codex-assisted discovery is available with ${searchQueries.length} ${queryLabel} and ${discoveryBacklog.length} backlog ${companyLabel}.`);
+      console.error('Use the generated search queries and backlog companies in Codex to continue hybrid discovery.');
+      process.exit(1);
+    }
+
+    console.error('Error: no tracked companies are configured. Confirm target companies and rebuild portals.yml first.');
+    process.exit(1);
+  }
 
   console.log(`Scanning ${targets.length} companies via API (${skippedCount} skipped — no API detected)`);
   if (dryRun) console.log('(dry run — no files will be written)\n');
@@ -365,6 +342,10 @@ async function main() {
     for (const e of errors) {
       console.log(`  ✗ ${e.company}: ${e.error}`);
     }
+  }
+
+  if (discoveryBacklog.length > 0 || searchQueries.length > 0) {
+    console.log(`\nHybrid discovery backlog: ${discoveryBacklog.length} unsupported compan${discoveryBacklog.length === 1 ? 'y' : 'ies'}, ${searchQueries.length} Codex query${searchQueries.length === 1 ? '' : 'ies'}.`);
   }
 
   if (newOffers.length > 0) {

@@ -1,3 +1,6 @@
+import { buildHybridDiscoveryPlan, mergeDiscoveryQueries } from "./discovery.mjs";
+import { getConfirmedRoleKeywords } from "./workflow-state.mjs";
+
 function uniqueStrings(values) {
   return [...new Set(values.filter(Boolean).map((value) => String(value).trim()).filter(Boolean))];
 }
@@ -23,13 +26,13 @@ export function buildPortalsConfig({
 }) {
   const countries = preferences.geography?.countries || [];
   const cities = preferences.geography?.cities || [];
-  const roleKeywords = uniqueStrings(preferences.rolePreferences?.includedKeywords || []);
+  const roleKeywords = uniqueStrings(getConfirmedRoleKeywords(preferences));
   const excludedKeywords = uniqueStrings(preferences.rolePreferences?.excludedKeywords || []);
   const excludedCompanies = new Set(
     uniqueStrings(preferences.companyPreferences?.excludedCompanies || []).map((value) => value.toLowerCase()),
   );
 
-  const trackedCompanies = [
+  const companyPool = [
     ...acceptedCompanies,
     ...(preferences.companyPreferences?.customCompanies || []),
   ]
@@ -47,13 +50,23 @@ export function buildPortalsConfig({
     ...remoteTerms(preferences.geography?.remotePolicy),
   ]);
 
-  const searchQueries = queryTemplates.map((template, index) => ({
+  const templatedQueries = queryTemplates.map((template, index) => ({
     name: template.name || `Generated query ${index + 1}`,
     query: buildQuery(template.template, locationTerms, roleKeywords),
     enabled: true,
   }));
 
+  const { trackedCompanies, discoveryBacklog } = buildHybridDiscoveryPlan(companyPool, {
+    locationTerms,
+    roleKeywords,
+  });
+  const searchQueries = mergeDiscoveryQueries(templatedQueries, discoveryBacklog);
+
   return {
+    metadata: {
+      discovery_mode: "hybrid",
+      generated_from_confirmed_targets: true,
+    },
     title_filter: {
       positive: roleKeywords,
       negative: excludedKeywords,
@@ -63,6 +76,7 @@ export function buildPortalsConfig({
       exclude: [],
     },
     tracked_companies: trackedCompanies,
+    discovery_backlog: discoveryBacklog,
     search_queries: searchQueries,
   };
 }

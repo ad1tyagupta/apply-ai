@@ -6,10 +6,21 @@ Only prepare or tailor a CV after a role reaches the active minimum score.
 
 ## Threshold Behavior
 
-- below threshold
-  - reject the role and log the reason
-- at or above threshold
-  - tailor from source-backed evidence only
+- for `broad` and `balanced`
+  - below `60`
+    - reject the role and log the reason
+  - `60-79`
+    - use one reusable generic CV
+    - still create a cover letter
+  - `80+`
+    - create a custom CV
+    - create a cover letter
+- for `highly selective`
+  - below `85`
+    - reject the role and log the reason
+  - `85+`
+    - always create a custom CV
+    - always create a cover letter
 
 ## Fact Rule
 

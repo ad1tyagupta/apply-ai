@@ -12,6 +12,7 @@
     "portals:build": "node career_ops_core/build-portals.mjs",
     "scan": "node career_ops_core/scan.mjs",
     "scan:dry": "node career_ops_core/scan.mjs --dry-run",
+    "score": "node career_ops_core/score-opportunity.mjs",
     "pdf": "node career_ops_core/generate-pdf.mjs",
     "sync-check": "node career_ops_core/cv-sync-check.mjs",
     "verify": "node career_ops_core/verify-pipeline.mjs",

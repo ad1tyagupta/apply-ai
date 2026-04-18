@@ -8,6 +8,8 @@ test("recommendTargets ranks roles and companies from user preferences and seede
     targetRoles: ["Product Marketing", "Growth Marketing", "Marketing Operations"],
     preferredIndustries: ["SaaS", "AI"],
     preferredCompanyStages: ["growth", "enterprise"],
+    inferredRoleSignals: [{ name: "Product Marketing", score: 14 }],
+    skills: ["Lifecycle", "SQL"],
   };
 
   const roleFamilies = [
@@ -35,4 +37,6 @@ test("recommendTargets ranks roles and companies from user preferences and seede
   assert.equal(result.roles[0].name, "Product Marketing");
   assert.equal(result.companies[0].name, "Notion");
   assert.match(result.companies[0].reason, /Matched/);
+  assert.equal(typeof result.roles[0].confidence, "number");
+  assert.equal(typeof result.companies[0].confidence, "number");
 });
