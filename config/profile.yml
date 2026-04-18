@@ -1,0 +1,23 @@
+candidate:
+  full_name: "Your Name"
+  email: "you@example.com"
+  phone: ""
+  location: "City, Country"
+  linkedin: ""
+  portfolio_url: ""
+  current_status: ""
+  work_authorization: ""
+  languages: []
+
+positioning:
+  headline: "Complete onboarding to replace this placeholder."
+  summary: "Build this profile from uploaded documents only."
+
+application_rules:
+  fact_only: true
+  manual_submission_only: true
+  workday_safe: true
+
+runtime:
+  active_base_cv: "cv.md"
+  article_digest: "article-digest.md"

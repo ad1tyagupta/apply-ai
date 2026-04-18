@@ -1,0 +1,39 @@
+onboarding:
+  completed: false
+  last_completed_step: "not-started"
+
+geography:
+  countries: []
+  cities: []
+  remotePolicy: "hybrid"
+
+searchMode:
+  mode: "balanced"
+  minimumScore: 75
+
+rolePreferences:
+  targetRoleBreadth: "balanced"
+  preferredRoleFamilies:
+    - "Product Marketing"
+    - "Growth Marketing"
+  includedKeywords:
+    - "Product Marketing"
+    - "Growth"
+  excludedKeywords: []
+  preferredIndustries:
+    - "SaaS"
+    - "AI"
+  preferredCompanyStages:
+    - "growth"
+    - "enterprise"
+
+companyPreferences:
+  preferredCompanies: []
+  acceptedCompanies: []
+  excludedCompanies: []
+  customCompanies: []
+
+documents:
+  rawDir: "intake/raw"
+  normalizedDir: "intake/normalized"
+  wikiDir: "profile/wiki"

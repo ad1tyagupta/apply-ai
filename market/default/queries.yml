@@ -1,0 +1,9 @@
+queries:
+  - name: "starter-product-marketing"
+    template: 'site:jobs.ashbyhq.com OR site:boards.greenhouse.io {{location_terms}} "{{role_keyword_1}}"'
+  - name: "starter-growth"
+    template: 'site:jobs.ashbyhq.com OR site:jobs.lever.co {{location_terms}} "{{role_keyword_2}}"'
+  - name: "starter-operations"
+    template: 'site:boards.greenhouse.io {{location_terms}} "Marketing Operations" OR "Business Operations"'
+  - name: "starter-strategy"
+    template: 'site:jobs.ashbyhq.com OR site:boards.greenhouse.io {{location_terms}} "Commercial Strategy" OR "AI Strategy"'

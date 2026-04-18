@@ -1,0 +1,23 @@
+candidate:
+  full_name: "Your Name"
+  email: "you@example.com"
+  phone: ""
+  location: "City, Country"
+  linkedin: ""
+  portfolio_url: ""
+  current_status: ""
+  work_authorization: ""
+  languages: []
+
+positioning:
+  headline: "Operator or specialist combining domain expertise with structured execution."
+  summary: "Replace with a short factual summary after onboarding."
+
+application_rules:
+  fact_only: true
+  manual_submission_only: true
+  workday_safe: true
+
+runtime:
+  active_base_cv: "cv.md"
+  article_digest: "article-digest.md"

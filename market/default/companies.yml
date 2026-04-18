@@ -1,0 +1,151 @@
+companies:
+  - name: "Notion"
+    careers_url: "https://jobs.ashbyhq.com/notion"
+    industries: ["SaaS", "Productivity"]
+    stages: ["growth"]
+    roleKeywords: ["Product Marketing", "Growth", "Lifecycle"]
+  - name: "Canva"
+    careers_url: "https://www.lifeatcanva.com/en/jobs/"
+    industries: ["SaaS", "Design"]
+    stages: ["growth"]
+    roleKeywords: ["Product Marketing", "Growth", "Brand"]
+  - name: "HubSpot"
+    careers_url: "https://www.hubspot.com/careers/jobs"
+    industries: ["SaaS", "CRM"]
+    stages: ["public", "enterprise"]
+    roleKeywords: ["Product Marketing", "Growth", "Operations"]
+  - name: "Miro"
+    careers_url: "https://miro.com/careers/open-positions/"
+    industries: ["SaaS", "Collaboration"]
+    stages: ["growth"]
+    roleKeywords: ["Product Marketing", "Growth"]
+  - name: "Atlassian"
+    careers_url: "https://www.atlassian.com/company/careers/all-jobs"
+    industries: ["SaaS", "Developer Tools"]
+    stages: ["public", "enterprise"]
+    roleKeywords: ["Product Marketing", "Operations"]
+  - name: "OpenAI"
+    careers_url: "https://jobs.ashbyhq.com/openai"
+    industries: ["AI"]
+    stages: ["growth", "enterprise"]
+    roleKeywords: ["Product Marketing", "Strategy", "Operations"]
+  - name: "Anthropic"
+    careers_url: "https://jobs.ashbyhq.com/anthropic"
+    industries: ["AI"]
+    stages: ["growth"]
+    roleKeywords: ["Strategy", "Operations", "Product Marketing"]
+  - name: "Cohere"
+    careers_url: "https://jobs.ashbyhq.com/cohere"
+    industries: ["AI"]
+    stages: ["growth"]
+    roleKeywords: ["Product Marketing", "Partnerships", "Strategy"]
+  - name: "Intercom"
+    careers_url: "https://jobs.ashbyhq.com/intercom"
+    industries: ["SaaS", "Support"]
+    stages: ["growth"]
+    roleKeywords: ["Product Marketing", "Lifecycle"]
+  - name: "Linear"
+    careers_url: "https://jobs.ashbyhq.com/linear"
+    industries: ["SaaS", "Developer Tools"]
+    stages: ["growth"]
+    roleKeywords: ["Product Marketing", "Community"]
+  - name: "Airtable"
+    careers_url: "https://jobs.ashbyhq.com/airtable"
+    industries: ["SaaS", "No-Code"]
+    stages: ["growth"]
+    roleKeywords: ["Product Marketing", "Operations"]
+  - name: "Figma"
+    careers_url: "https://boards.greenhouse.io/figma"
+    industries: ["SaaS", "Design"]
+    stages: ["growth"]
+    roleKeywords: ["Product Marketing", "Growth"]
+  - name: "Plaid"
+    careers_url: "https://jobs.ashbyhq.com/plaid"
+    industries: ["Fintech", "SaaS"]
+    stages: ["growth"]
+    roleKeywords: ["Product Marketing", "Operations"]
+  - name: "Stripe"
+    careers_url: "https://stripe.com/jobs/search"
+    industries: ["Fintech"]
+    stages: ["growth", "enterprise"]
+    roleKeywords: ["Product Marketing", "Operations", "Commercial Strategy"]
+  - name: "Ramp"
+    careers_url: "https://jobs.ashbyhq.com/ramp"
+    industries: ["Fintech"]
+    stages: ["growth"]
+    roleKeywords: ["Growth", "Lifecycle", "Operations"]
+  - name: "Brex"
+    careers_url: "https://boards.greenhouse.io/brex"
+    industries: ["Fintech"]
+    stages: ["growth"]
+    roleKeywords: ["Growth", "Operations", "Strategy"]
+  - name: "Wise"
+    careers_url: "https://www.wise.jobs/role"
+    industries: ["Fintech"]
+    stages: ["public", "enterprise"]
+    roleKeywords: ["Growth", "Product Marketing"]
+  - name: "Mistral AI"
+    careers_url: "https://jobs.ashbyhq.com/mistral"
+    industries: ["AI"]
+    stages: ["growth"]
+    roleKeywords: ["Strategy", "Product Marketing"]
+  - name: "LangChain"
+    careers_url: "https://jobs.ashbyhq.com/langchain"
+    industries: ["AI", "Developer Tools"]
+    stages: ["growth"]
+    roleKeywords: ["Product Marketing", "Community", "Strategy"]
+  - name: "Retool"
+    careers_url: "https://jobs.ashbyhq.com/retool"
+    industries: ["SaaS", "Developer Tools"]
+    stages: ["growth"]
+    roleKeywords: ["Product Marketing", "Growth", "Operations"]
+  - name: "Webflow"
+    careers_url: "https://webflow.com/careers"
+    industries: ["SaaS", "No-Code"]
+    stages: ["growth"]
+    roleKeywords: ["Product Marketing", "Growth"]
+  - name: "Zapier"
+    careers_url: "https://zapier.com/jobs"
+    industries: ["Automation", "SaaS"]
+    stages: ["growth"]
+    roleKeywords: ["Growth", "Operations", "Product Marketing"]
+  - name: "n8n"
+    careers_url: "https://jobs.ashbyhq.com/n8n"
+    industries: ["Automation", "AI"]
+    stages: ["growth"]
+    roleKeywords: ["Growth", "Operations", "Product Marketing"]
+  - name: "Pleo"
+    careers_url: "https://jobs.ashbyhq.com/pleo"
+    industries: ["Fintech"]
+    stages: ["growth"]
+    roleKeywords: ["Growth", "Operations"]
+  - name: "Personio"
+    careers_url: "https://www.personio.com/about-personio/careers/open-positions/"
+    industries: ["HR Tech", "SaaS"]
+    stages: ["growth"]
+    roleKeywords: ["Product Marketing", "Growth", "Operations"]
+  - name: "Deel"
+    careers_url: "https://jobs.ashbyhq.com/deel"
+    industries: ["HR Tech", "SaaS"]
+    stages: ["growth"]
+    roleKeywords: ["Growth", "Operations", "Commercial Strategy"]
+  - name: "Rippling"
+    careers_url: "https://ats.rippling.com/en/jobs"
+    industries: ["HR Tech", "SaaS"]
+    stages: ["growth"]
+    roleKeywords: ["Operations", "Product Marketing"]
+  - name: "GitHub"
+    careers_url: "https://www.github.careers/careers-home/jobs"
+    industries: ["Developer Tools"]
+    stages: ["enterprise"]
+    roleKeywords: ["Product Marketing", "Community", "Strategy"]
+  - name: "Vercel"
+    careers_url: "https://vercel.com/careers"
+    industries: ["Developer Tools", "SaaS"]
+    stages: ["growth"]
+    roleKeywords: ["Product Marketing", "Growth", "Community"]
+  - name: "Amplitude"
+    careers_url: "https://boards.greenhouse.io/amplitude"
+    industries: ["Analytics", "SaaS"]
+    stages: ["public", "growth"]
+    roleKeywords: ["Product Marketing", "Growth", "Analytics"]

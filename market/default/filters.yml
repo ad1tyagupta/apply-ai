@@ -1,0 +1,21 @@
+hard_stops:
+  - id: "missing-location-fit"
+    rule: "Reject when the role location is clearly outside the user’s target geography."
+  - id: "language-blocker"
+    rule: "Reject when the role demands language ability beyond the user’s documented ability."
+  - id: "unsupported-claim-risk"
+    rule: "Reject when a strong application would require claims missing from the uploaded documents."
+
+scoring_defaults:
+  broad: 60
+  balanced: 75
+  highly_selective: 90
+
+scoring_dimensions:
+  - "role-fit"
+  - "evidence-fit"
+  - "narrative-fit"
+  - "location-fit"
+  - "seniority-realism"
+  - "language-fit"
+  - "company-attractiveness"

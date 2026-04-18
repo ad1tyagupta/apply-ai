@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+
+# OS noise
+.DS_Store
+*.swp
+*.bak
+*.tmp
+*.orig
+*.rej
+
+# Local environment
+.env
+.env.*
+
+# User-provided source documents
+intake/raw/*
+!intake/raw/README.md
+
+# Normalized markdown derived from uploads
+intake/normalized/*
+!intake/normalized/README.md
+
+# Derived user profile working memory
+profile/wiki/*
+!profile/wiki/README.md
+profile/target-recommendations.md
+
+# Personalized runtime files
+config/profile.yml
+config/user-preferences.yml
+cv.md
+article-digest.md
+portals.yml
+
+# User tracking and application state
+data/applications.md
+data/follow-ups.md
+data/pipeline.md
+data/scan-history.tsv
+
+# Generated outputs
+output/*
+!output/README.md
+reports/*
+!reports/README.md

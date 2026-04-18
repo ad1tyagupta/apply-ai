@@ -1,0 +1,39 @@
+{
+  "name": "apply-ai",
+  "version": "0.2.0",
+  "private": true,
+  "description": "ApplyAI is a Codex-first workspace for source-backed profile building, structured job discovery, scoring, and factual application prep.",
+  "type": "module",
+  "scripts": {
+    "doctor": "node career_ops_core/doctor.mjs",
+    "ingest": "node career_ops_core/ingest-documents.mjs",
+    "profile:build": "node career_ops_core/build-profile-wiki.mjs",
+    "recommend": "node career_ops_core/recommend-targets.mjs",
+    "portals:build": "node career_ops_core/build-portals.mjs",
+    "scan": "node career_ops_core/scan.mjs",
+    "scan:dry": "node career_ops_core/scan.mjs --dry-run",
+    "pdf": "node career_ops_core/generate-pdf.mjs",
+    "sync-check": "node career_ops_core/cv-sync-check.mjs",
+    "verify": "node career_ops_core/verify-pipeline.mjs",
+    "normalize": "node career_ops_core/normalize-statuses.mjs",
+    "dedup": "node career_ops_core/dedup-tracker.mjs",
+    "merge": "node career_ops_core/merge-tracker.mjs",
+    "patterns": "node career_ops_core/analyze-patterns.mjs --summary",
+    "followup": "node career_ops_core/followup-cadence.mjs --summary",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "keywords": [
+    "career-ops",
+    "codex",
+    "job-search",
+    "resume",
+    "career-automation"
+  ],
+  "dependencies": {
+    "js-yaml": "^4.1.1",
+    "mammoth": "^1.9.1",
+    "pdf-parse": "^1.1.1",
+    "playwright": "^1.58.1",
+    "tesseract.js": "^5.1.1"
+  }
+}

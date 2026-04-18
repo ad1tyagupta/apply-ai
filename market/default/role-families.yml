@@ -1,0 +1,37 @@
+role_families:
+  - name: "Product Marketing"
+    starterPriority: 10
+    keywords: ["product marketing", "positioning", "go to market"]
+  - name: "Growth Marketing"
+    starterPriority: 10
+    keywords: ["growth", "acquisition", "performance marketing"]
+  - name: "Marketing Operations"
+    starterPriority: 9
+    keywords: ["marketing operations", "automation", "crm"]
+  - name: "Marketing Analytics"
+    starterPriority: 8
+    keywords: ["analytics", "reporting", "attribution"]
+  - name: "Business Operations"
+    starterPriority: 8
+    keywords: ["business operations", "process", "cross-functional"]
+  - name: "Commercial Strategy"
+    starterPriority: 8
+    keywords: ["commercial strategy", "revenue", "planning"]
+  - name: "Lifecycle Marketing"
+    starterPriority: 7
+    keywords: ["lifecycle", "retention", "crm"]
+  - name: "Revenue Operations"
+    starterPriority: 7
+    keywords: ["revops", "operations", "sales systems"]
+  - name: "AI Strategy"
+    starterPriority: 7
+    keywords: ["ai strategy", "transformation", "adoption"]
+  - name: "Partnerships"
+    starterPriority: 6
+    keywords: ["partnerships", "alliances", "ecosystem"]
+  - name: "Community"
+    starterPriority: 6
+    keywords: ["community", "developer relations", "evangelism"]
+  - name: "Program Management"
+    starterPriority: 6
+    keywords: ["program management", "launch", "coordination"]
