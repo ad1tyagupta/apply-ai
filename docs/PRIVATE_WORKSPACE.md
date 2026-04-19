@@ -11,6 +11,8 @@ Use the public repo for code, generic examples, documentation, and public-safe d
 
 Use the private workspace for real uploads in `intake/raw/`, active tracker data, generated outputs, and personal experiments.
 
+When Codex asks for documents, it should create or confirm `intake/raw/`, print the full absolute path, and run `npm run uploads:check` after upload so the user can confirm the file list.
+
 ## Why This Split Exists
 
 - keeps personal data out of the public repository

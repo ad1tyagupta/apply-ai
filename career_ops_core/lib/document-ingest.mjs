@@ -1,7 +1,9 @@
 import { mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
-import { basename, extname, join } from "node:path";
+import { basename, extname, join, resolve } from "node:path";
 
 const IMAGE_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".tif", ".tiff"]);
+const SUPPORTED_EXTENSIONS = new Set([".md", ".txt", ".pdf", ".docx", ...IMAGE_EXTENSIONS]);
+const DISCOURAGED_EVIDENCE_RE = /\b(transcript|certificate|certification|marksheet|mark-sheet|mark sheet|grade|grades|diploma)\b/i;
 
 function toSlug(fileName) {
   return basename(fileName, extname(fileName))
@@ -23,6 +25,40 @@ function frontmatterFor(sourceFile, converter) {
 
 function normalizePlainText(text) {
   return text.replace(/\r\n/g, "\n").trim() + "\n";
+}
+
+export function inspectRawDocuments({ rawDir }) {
+  mkdirSync(rawDir, { recursive: true });
+
+  const files = readdirSync(rawDir, { withFileTypes: true })
+    .filter((entry) => entry.isFile())
+    .filter((entry) => entry.name.toLowerCase() !== "readme.md")
+    .map((entry) => entry.name)
+    .sort();
+
+  const documents = files.map((fileName) => {
+    const filePath = join(rawDir, fileName);
+    const ext = extname(fileName).toLowerCase();
+    const supported = SUPPORTED_EXTENSIONS.has(ext);
+    const warning = DISCOURAGED_EVIDENCE_RE.test(fileName)
+      ? "This looks like a transcript/certificate/marks file. Prefer to summarize certificate names, grades, or marks in text to avoid noisy evidence."
+      : "";
+    const stats = statSync(filePath);
+
+    return {
+      fileName,
+      filePath,
+      fileSizeBytes: stats.size,
+      supported,
+      warning,
+    };
+  });
+
+  return {
+    uploadFolder: resolve(rawDir),
+    readyForIngest: documents.some((document) => document.supported),
+    documents,
+  };
 }
 
 export async function ingestDocuments({

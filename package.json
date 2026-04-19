@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "doctor": "node career_ops_core/doctor.mjs",
+    "uploads:check": "node career_ops_core/check-uploads.mjs",
     "ingest": "node career_ops_core/ingest-documents.mjs",
     "profile:build": "node career_ops_core/build-profile-wiki.mjs",
     "recommend": "node career_ops_core/recommend-targets.mjs",

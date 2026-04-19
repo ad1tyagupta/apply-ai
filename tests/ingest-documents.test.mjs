@@ -4,7 +4,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync, existsSync, readFileSync
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { ingestDocuments } from "../career_ops_core/lib/document-ingest.mjs";
+import { ingestDocuments, inspectRawDocuments } from "../career_ops_core/lib/document-ingest.mjs";
 
 async function withTempDir(fn) {
   const tempRoot = mkdtempSync(join(tmpdir(), "career-ops-ingest-"));
@@ -115,5 +115,28 @@ test("ingestDocuments ignores template README files in the raw folder", async ()
     });
 
     assert.equal(results.length, 0);
+  });
+});
+
+test("inspectRawDocuments creates the upload folder and warns about noisy evidence files", async () => {
+  await withTempDir(async (root) => {
+    const rawDir = join(root, "intake", "raw");
+    const empty = inspectRawDocuments({ rawDir });
+
+    assert.equal(empty.uploadFolder, rawDir);
+    assert.equal(empty.documents.length, 0);
+    assert.equal(empty.readyForIngest, false);
+
+    writeFileSync(join(rawDir, "old-cv.pdf"), "fake", "utf8");
+    writeFileSync(join(rawDir, "certificate.png"), "fake", "utf8");
+
+    const inspection = inspectRawDocuments({ rawDir });
+
+    assert.equal(inspection.readyForIngest, true);
+    assert.deepEqual(
+      inspection.documents.map((document) => document.fileName),
+      ["certificate.png", "old-cv.pdf"],
+    );
+    assert.equal(inspection.documents.some((document) => document.warning?.includes("summarize")), true);
   });
 });

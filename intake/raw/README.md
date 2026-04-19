@@ -2,6 +2,14 @@
 
 Place original user uploads here.
 
+Codex should give the user the full absolute path to this folder before upload. After files are added, run:
+
+```bash
+npm run uploads:check
+```
+
+Then confirm the detected file list with the user before ingesting.
+
 Examples:
 
 - old CVs

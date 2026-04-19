@@ -12,15 +12,29 @@ geography:
   cities: []
   remotePolicy: "hybrid"
 
+limitations:
+  confirmed: false
+  unavailableCountries: []
+  languageLimits:
+    # Example:
+    # - language: "German"
+    #   currentLevel: "A2"
+    #   learningLevel: "B1"
+    #   maxRoleRequirement: "B1"
+  rejectPostingLanguages: []
+  notes: []
+
 searchMode:
   mode: "balanced"
-  minimumScore: 75
+  minimumScore: 60
 
 rolePreferences:
   targetRoleBreadth: "balanced"
   preferredRoleFamilies: []
   includedKeywords: []
   excludedKeywords: []
+  targetSeniorities: []
+  openToInternships: false
   preferredIndustries: []
   preferredCompanyStages: []
 
@@ -36,3 +50,8 @@ documents:
   wikiDir: "profile/wiki"
   factsPath: "profile/facts.yml"
   recommendationsPath: "profile/recommendations.yml"
+
+applicationMaterials:
+  outputFormat: "pdf"
+  formattingApproved: false
+  formattingSamplePath: ""

@@ -33,8 +33,9 @@ ApplyAI is designed to stay factual.
 2. Create a private sibling workspace for real job-search use if you want to keep personal files out of the public repo.
 3. Open Codex in the workspace you plan to use.
 4. Let Codex guide the onboarding conversation.
-5. Upload documents into `intake/raw/`.
-6. Run the helper scripts when Codex asks for them.
+5. When Codex asks for uploads, use the full `intake/raw` folder path it prints.
+6. Let Codex verify the uploaded file list before ingesting.
+7. Run the helper scripts when Codex asks for them.
 
 ## Setup
 
@@ -47,6 +48,7 @@ npm run doctor
 ## Recommended Workflow
 
 ```bash
+npm run uploads:check
 npm run ingest
 npm run profile:build
 npm run recommend
@@ -55,6 +57,7 @@ npm run scan
 ```
 
 `npm run profile:build` now generates both `profile/facts.yml` and `profile/wiki/*`.
+`npm run uploads:check` prints the absolute upload folder and lists uploaded files so Codex can confirm them with the user before ingest.
 
 ## Search Modes
 
@@ -89,6 +92,21 @@ Avoid uploading:
 - mark sheets
 
 If certificates, grades, or marks matter, summarize them in text instead of uploading more files.
+
+## Limitations And Role Level
+
+During onboarding, ApplyAI asks for limitations before discovery starts.
+
+Examples:
+
+- countries or regions where the user cannot work
+- visa or work authorization constraints
+- language ceilings, such as "German A2, learning B1, reject roles requiring German above B1"
+- posting-language blockers, such as "reject German-language postings"
+
+ApplyAI also asks for seniority intent. This matters because users may intentionally target junior or mid-level roles in a new market even if they have more experience elsewhere, or they may want internships included or rejected.
+
+Selected companies are priority companies, not a hard limit. ApplyAI should still use market-wide discovery queries for all matching companies in the chosen geography.
 
 ## Repository Layout
 

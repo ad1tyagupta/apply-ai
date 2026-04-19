@@ -3,6 +3,10 @@ hard_stops:
     rule: "Reject when the role location is clearly outside the user’s target geography."
   - id: "language-blocker"
     rule: "Reject when the role demands language ability beyond the user’s documented ability."
+  - id: "posting-language-blocker"
+    rule: "Reject when the job post itself is written in a language the user marked as a no-go."
+  - id: "seniority-intent-blocker"
+    rule: "Reject internships or role levels the user explicitly ruled out."
   - id: "unsupported-claim-risk"
     rule: "Reject when a strong application would require claims missing from the uploaded documents."
 

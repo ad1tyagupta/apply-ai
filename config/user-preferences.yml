@@ -7,25 +7,26 @@ geography:
   cities: []
   remotePolicy: "hybrid"
 
+limitations:
+  confirmed: false
+  unavailableCountries: []
+  languageLimits: []
+  rejectPostingLanguages: []
+  notes: []
+
 searchMode:
   mode: "balanced"
-  minimumScore: 75
+  minimumScore: 60
 
 rolePreferences:
   targetRoleBreadth: "balanced"
-  preferredRoleFamilies:
-    - "Product Marketing"
-    - "Growth Marketing"
-  includedKeywords:
-    - "Product Marketing"
-    - "Growth"
+  preferredRoleFamilies: []
+  includedKeywords: []
   excludedKeywords: []
-  preferredIndustries:
-    - "SaaS"
-    - "AI"
-  preferredCompanyStages:
-    - "growth"
-    - "enterprise"
+  targetSeniorities: []
+  openToInternships: false
+  preferredIndustries: []
+  preferredCompanyStages: []
 
 companyPreferences:
   preferredCompanies: []
@@ -37,3 +38,10 @@ documents:
   rawDir: "intake/raw"
   normalizedDir: "intake/normalized"
   wikiDir: "profile/wiki"
+  factsPath: "profile/facts.yml"
+  recommendationsPath: "profile/recommendations.yml"
+
+applicationMaterials:
+  outputFormat: "pdf"
+  formattingApproved: false
+  formattingSamplePath: ""

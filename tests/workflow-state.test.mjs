@@ -5,6 +5,7 @@ import {
   assessOnboardingState,
   getConfirmedRoleKeywords,
   getSearchStrategy,
+  getUserLimitations,
 } from "../career_ops_core/lib/workflow-state.mjs";
 
 test("getSearchStrategy returns default thresholds and explanations for built-in modes", () => {
@@ -48,6 +49,7 @@ test("assessOnboardingState blocks discovery until geography, documents, brain, 
     {
       geography: { countries: [] },
       searchMode: { mode: "balanced", minimumScore: 75 },
+      limitations: { confirmed: false },
       rolePreferences: { preferredRoleFamilies: [], includedKeywords: [] },
       companyPreferences: { acceptedCompanies: [], customCompanies: [] },
     },
@@ -63,10 +65,10 @@ test("assessOnboardingState blocks discovery until geography, documents, brain, 
     incomplete.missingSteps,
     [
       "Confirm a target country or city.",
+      "Confirm work and language limitations, even if there are none.",
       "Upload source documents into intake/raw/.",
       "Run the brain build so profile facts exist.",
       "Confirm at least one target role family or keyword.",
-      "Confirm or add at least one target company.",
     ],
   );
 
@@ -74,12 +76,25 @@ test("assessOnboardingState blocks discovery until geography, documents, brain, 
     {
       geography: { countries: ["Germany"], cities: ["Berlin"] },
       searchMode: { mode: "balanced", minimumScore: 75 },
+      limitations: {
+        confirmed: true,
+        unavailableCountries: ["United States"],
+        languageLimits: [
+          {
+            language: "German",
+            currentLevel: "A2",
+            learningLevel: "B1",
+            maxRoleRequirement: "B1",
+          },
+        ],
+        rejectPostingLanguages: ["German"],
+      },
       rolePreferences: {
         preferredRoleFamilies: ["Product Marketing"],
         includedKeywords: ["Product Marketing", "Lifecycle"],
       },
       companyPreferences: {
-        acceptedCompanies: ["Notion"],
+        acceptedCompanies: [],
         customCompanies: [],
       },
     },
@@ -92,4 +107,29 @@ test("assessOnboardingState blocks discovery until geography, documents, brain, 
 
   assert.equal(complete.readyForDiscovery, true);
   assert.deepEqual(complete.missingSteps, []);
+});
+
+test("getUserLimitations normalizes language and posting blockers", () => {
+  const limitations = getUserLimitations({
+    limitations: {
+      confirmed: true,
+      unavailableCountries: ["United States", "  "],
+      languageLimits: [
+        {
+          language: "German",
+          currentLevel: "A2",
+          learningLevel: "B1",
+          maxRoleRequirement: "B1",
+        },
+      ],
+      rejectPostingLanguages: ["German"],
+      notes: ["Cannot work where sponsorship is unavailable."],
+    },
+  });
+
+  assert.equal(limitations.confirmed, true);
+  assert.deepEqual(limitations.unavailableCountries, ["United States"]);
+  assert.equal(limitations.languageLimits[0].language, "German");
+  assert.equal(limitations.languageLimits[0].maxRoleRequirement, "B1");
+  assert.deepEqual(limitations.rejectPostingLanguages, ["German"]);
 });

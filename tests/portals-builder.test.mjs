@@ -10,6 +10,10 @@ test("buildPortalsConfig merges preferences with accepted companies and role key
       cities: ["Berlin"],
       remotePolicy: "hybrid",
     },
+    limitations: {
+      confirmed: true,
+      unavailableCountries: ["United States"],
+    },
     rolePreferences: {
       includedKeywords: ["Product Marketing", "Growth"],
       excludedKeywords: ["Intern"],
@@ -53,6 +57,7 @@ test("buildPortalsConfig merges preferences with accepted companies and role key
   });
 
   assert.deepEqual(config.location_filter.include, ["Germany", "Berlin", "Remote", "Hybrid"]);
+  assert.deepEqual(config.location_filter.exclude, ["United States"]);
   assert.equal(config.tracked_companies.length, 1);
   assert.equal(config.tracked_companies[0].name, "Notion");
   assert.equal(config.discovery_backlog.length, 1);
@@ -60,4 +65,36 @@ test("buildPortalsConfig merges preferences with accepted companies and role key
   assert.equal(config.search_queries.length, 2);
   assert.match(config.search_queries[0].query, /Germany OR Berlin/);
   assert.match(config.search_queries[0].query, /Product Marketing/);
+});
+
+test("buildPortalsConfig keeps market-wide discovery even without confirmed companies", () => {
+  const config = buildPortalsConfig({
+    preferences: {
+      geography: {
+        countries: ["Germany"],
+        cities: ["Berlin"],
+        remotePolicy: "hybrid",
+      },
+      rolePreferences: {
+        includedKeywords: ["Product Marketing", "Growth"],
+      },
+      companyPreferences: {
+        acceptedCompanies: [],
+        customCompanies: [],
+      },
+    },
+    acceptedCompanies: [],
+    queryTemplates: [
+      {
+        name: "Market-wide search",
+        template: 'site:jobs.ashbyhq.com OR site:boards.greenhouse.io {{location_terms}} "{{role_keyword_1}}"',
+      },
+    ],
+  });
+
+  assert.equal(config.metadata.market_wide_discovery, true);
+  assert.equal(config.tracked_companies.length, 0);
+  assert.equal(config.discovery_backlog.length, 0);
+  assert.equal(config.search_queries.length, 1);
+  assert.match(config.search_queries[0].query, /Germany OR Berlin/);
 });

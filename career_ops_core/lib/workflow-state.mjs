@@ -48,6 +48,24 @@ export function getSearchStrategy(preferences = {}) {
   };
 }
 
+export function getUserLimitations(preferences = {}) {
+  const limitations = preferences.limitations || {};
+  return {
+    confirmed: limitations.confirmed === true,
+    unavailableCountries: uniqueStrings(limitations.unavailableCountries || []),
+    languageLimits: (limitations.languageLimits || [])
+      .filter((limit) => limit?.language)
+      .map((limit) => ({
+        language: String(limit.language).trim(),
+        currentLevel: String(limit.currentLevel || "").trim(),
+        learningLevel: String(limit.learningLevel || "").trim(),
+        maxRoleRequirement: String(limit.maxRoleRequirement || limit.maximumRequiredLevel || "").trim(),
+      })),
+    rejectPostingLanguages: uniqueStrings(limitations.rejectPostingLanguages || []),
+    notes: uniqueStrings(limitations.notes || []),
+  };
+}
+
 export function getConfirmedRoleFamilies(preferences = {}) {
   return uniqueStrings(preferences.rolePreferences?.preferredRoleFamilies || []);
 }
@@ -80,13 +98,16 @@ export function assessOnboardingState(
 ) {
   const countries = uniqueStrings(preferences.geography?.countries || []);
   const cities = uniqueStrings(preferences.geography?.cities || []);
+  const limitations = getUserLimitations(preferences);
   const roleKeywords = getConfirmedRoleKeywords(preferences);
-  const companies = getConfirmedCompanies(preferences);
 
   const missingSteps = [];
 
   if (countries.length === 0 && cities.length === 0) {
     missingSteps.push("Confirm a target country or city.");
+  }
+  if (!limitations.confirmed) {
+    missingSteps.push("Confirm work and language limitations, even if there are none.");
   }
   if (rawDocumentCount === 0) {
     missingSteps.push("Upload source documents into intake/raw/.");
@@ -99,16 +120,14 @@ export function assessOnboardingState(
   if (roleKeywords.length === 0) {
     missingSteps.push("Confirm at least one target role family or keyword.");
   }
-  if (companies.length === 0) {
-    missingSteps.push("Confirm or add at least one target company.");
-  }
 
   return {
     searchStrategy: getSearchStrategy(preferences),
     readyForDiscovery: missingSteps.length === 0,
-    readyForRecommendations: (countries.length > 0 || cities.length > 0) && rawDocumentCount > 0 && normalizedDocumentCount > 0 && hasProfileFacts,
+    readyForRecommendations: (countries.length > 0 || cities.length > 0) && limitations.confirmed && rawDocumentCount > 0 && normalizedDocumentCount > 0 && hasProfileFacts,
     confirmedRoleKeywords: roleKeywords,
-    confirmedCompanies: companies,
+    confirmedCompanies: getConfirmedCompanies(preferences),
+    limitations,
     missingSteps,
   };
 }

@@ -1,5 +1,5 @@
 import { buildHybridDiscoveryPlan, mergeDiscoveryQueries } from "./discovery.mjs";
-import { getConfirmedRoleKeywords } from "./workflow-state.mjs";
+import { getConfirmedRoleKeywords, getUserLimitations } from "./workflow-state.mjs";
 
 function uniqueStrings(values) {
   return [...new Set(values.filter(Boolean).map((value) => String(value).trim()).filter(Boolean))];
@@ -26,6 +26,7 @@ export function buildPortalsConfig({
 }) {
   const countries = preferences.geography?.countries || [];
   const cities = preferences.geography?.cities || [];
+  const limitations = getUserLimitations(preferences);
   const roleKeywords = uniqueStrings(getConfirmedRoleKeywords(preferences));
   const excludedKeywords = uniqueStrings(preferences.rolePreferences?.excludedKeywords || []);
   const excludedCompanies = new Set(
@@ -66,6 +67,8 @@ export function buildPortalsConfig({
     metadata: {
       discovery_mode: "hybrid",
       generated_from_confirmed_targets: true,
+      market_wide_discovery: true,
+      priority_companies_only: false,
     },
     title_filter: {
       positive: roleKeywords,
@@ -73,7 +76,7 @@ export function buildPortalsConfig({
     },
     location_filter: {
       include: locationTerms,
-      exclude: [],
+      exclude: limitations.unavailableCountries,
     },
     tracked_companies: trackedCompanies,
     discovery_backlog: discoveryBacklog,

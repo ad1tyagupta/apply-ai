@@ -21,6 +21,7 @@ Each normalized document should have a matching manifest file with provenance de
 These files summarize the user without becoming a new source of truth.
 
 - `config/user-preferences.yml`
+  - onboarding state, geography, limitations, search mode, role intent, priority companies, and material-format approval
 - `config/profile.yml`
 - `profile/facts.yml`
 - `profile/recommendations.yml`
@@ -48,6 +49,8 @@ These files are safe to regenerate at any time.
 
 - `output/*`
 - `reports/*`
+
+The first generated CV PDF and cover-letter PDF are used as a one-time formatting sample while `applicationMaterials.formattingApproved` is false.
 
 ## Reusable Engine Files
 
