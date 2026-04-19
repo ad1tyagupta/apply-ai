@@ -259,6 +259,55 @@ test("scoreOpportunity rejects countries the user marked as unavailable", () => 
   assert.equal(result.reasons.some((reason) => /unavailable country/i.test(reason)), true);
 });
 
+test("scoreOpportunity does not match short keywords inside unrelated words", () => {
+  const result = scoreOpportunity({
+    opportunity: {
+      title: "Senior Partnerships Manager - Spain/Italy",
+      company: "Acme",
+      location: "Berlin, Germany",
+      description: "Own partner channels and ecosystem relationships.",
+    },
+    preferences: {
+      geography: { countries: ["Germany"], cities: ["Berlin"] },
+      searchMode: { mode: "balanced" },
+      rolePreferences: { preferredRoleFamilies: ["AI"], includedKeywords: ["AI"] },
+      companyPreferences: { acceptedCompanies: [] },
+    },
+    profileFacts: {
+      skills: [],
+      languages: ["English"],
+      inferred: { seniority: { level: "senior" }, roleSignals: [] },
+    },
+  });
+
+  assert.equal(result.reasons.some((reason) => /role intent/i.test(reason)), false);
+});
+
+test("scoreOpportunity rejects US-only remote roles for a Germany search", () => {
+  const result = scoreOpportunity({
+    opportunity: {
+      title: "AI Product Manager",
+      company: "Acme",
+      location: "Remote - United States",
+      description: "Remote role available only to candidates based in the United States.",
+    },
+    preferences: {
+      geography: { countries: ["Germany"], cities: ["Berlin"], remotePolicy: "remote" },
+      searchMode: { mode: "balanced" },
+      rolePreferences: { preferredRoleFamilies: ["AI"], includedKeywords: ["AI", "Product Manager"] },
+      companyPreferences: { acceptedCompanies: [] },
+    },
+    profileFacts: {
+      skills: ["AI", "Product Manager"],
+      languages: ["English"],
+      inferred: { seniority: { level: "senior" }, roleSignals: [{ name: "AI", score: 8 }] },
+    },
+  });
+
+  assert.equal(result.decision, "reject");
+  assert.equal(result.reasons.some((reason) => /geography/i.test(reason)), true);
+});
+
 test("scoreOpportunity marks PDF material formatting approval as a one-time first-run gate", () => {
   const baseInput = {
     opportunity: {

@@ -1,0 +1,22 @@
+role_families:
+  - name: "AI Solutions Engineering"
+    keywords: ["AI", "LLM", "Solutions Engineer", "Solutions Architect", "Customer Engineer"]
+    starterPriority: 10
+  - name: "Forward Deployed Engineering"
+    keywords: ["Forward Deployed", "Deployed Engineer", "Implementation Engineer", "Customer Engineer"]
+    starterPriority: 10
+  - name: "Applied AI Product"
+    keywords: ["AI Product Manager", "Technical Product Manager", "Product Manager", "GenAI"]
+    starterPriority: 9
+  - name: "Automation Engineering"
+    keywords: ["Automation", "Workflow", "n8n", "Internal Tools", "Business Systems"]
+    starterPriority: 9
+  - name: "GTM Engineering"
+    keywords: ["GTM Engineer", "RevOps", "Growth Engineer", "Sales Engineering", "Technical GTM"]
+    starterPriority: 8
+  - name: "AI Platform and MLOps"
+    keywords: ["MLOps", "LLMOps", "Platform Engineer", "ML Engineer", "AI Infrastructure"]
+    starterPriority: 8
+  - name: "Business Systems and RevOps"
+    keywords: ["Business Systems", "Revenue Operations", "RevOps", "CRM", "Internal Tools"]
+    starterPriority: 7

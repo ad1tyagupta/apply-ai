@@ -5,7 +5,8 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import yaml from "js-yaml";
 
-import { buildPortalsConfig } from "./lib/portals-builder.mjs";
+import { buildPortalsConfig, selectCompaniesForPortals } from "./lib/portals-builder.mjs";
+import { loadMarketData } from "./lib/market-loader.mjs";
 import { assessOnboardingState } from "./lib/workflow-state.mjs";
 
 const CORE_DIR = dirname(fileURLToPath(import.meta.url));
@@ -16,11 +17,13 @@ function loadYaml(path) {
 }
 
 const preferences = loadYaml(join(projectRoot, "config", "user-preferences.yml"));
-const companies = loadYaml(join(projectRoot, "market", "default", "companies.yml")).companies;
-const queryTemplates = loadYaml(join(projectRoot, "market", "default", "queries.yml")).queries;
+const market = loadMarketData(projectRoot, preferences);
+const companies = market.companies;
+const queryTemplates = market.queries;
 const rawDir = join(projectRoot, preferences.documents?.rawDir || "intake/raw");
 const normalizedDir = join(projectRoot, preferences.documents?.normalizedDir || "intake/normalized");
 const factsPath = join(projectRoot, preferences.documents?.factsPath || "profile/facts.yml");
+const recommendationsPath = join(projectRoot, preferences.documents?.recommendationsPath || "profile/recommendations.yml");
 
 const state = assessOnboardingState(preferences, {
   rawDocumentCount: existsSync(rawDir) ? readdirSync(rawDir).filter((file) => file.toLowerCase() !== "readme.md").length : 0,
@@ -36,23 +39,24 @@ if (!state.readyForDiscovery) {
   process.exit(1);
 }
 
-const acceptedNames = new Set(
-  (preferences.companyPreferences.acceptedCompanies || []).map((name) => String(name).toLowerCase()),
-);
-
-const acceptedCompanies = companies
-  .filter((company) => acceptedNames.has(company.name.toLowerCase()))
-  .map((company) => ({
-    ...company,
-    role_fit: company.roleKeywords || [],
-  }));
+const recommendations = existsSync(recommendationsPath) ? loadYaml(recommendationsPath) : null;
+const companySelection = selectCompaniesForPortals({
+  preferences,
+  companies,
+  recommendations,
+});
 
 const config = buildPortalsConfig({
   preferences,
-  acceptedCompanies,
+  acceptedCompanies: companySelection.companies,
   queryTemplates,
+  companySelectionSource: companySelection.source,
+  recommendationFallbackCount: companySelection.recommendationFallbackCount,
 });
 
 writeFileSync(join(projectRoot, "portals.yml"), yaml.dump(config, { lineWidth: 120 }), "utf8");
 
-console.log(`Generated portals.yml with ${config.tracked_companies.length} tracked companies, ${config.discovery_backlog.length} backlog companies, and ${config.search_queries.length} Codex discovery queries.`);
+if (companySelection.source === "recommendations") {
+  console.log(`No accepted companies configured; using ${companySelection.recommendationFallbackCount} top recommended companies for the scan plan.`);
+}
+console.log(`Generated portals.yml for ${market.name} with ${config.tracked_companies.length} tracked companies, ${config.discovery_backlog.length} backlog companies, and ${config.search_queries.length} Codex discovery queries.`);

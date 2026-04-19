@@ -1,0 +1,630 @@
+companies:
+  - name: "Aleph Alpha"
+    market: "Germany"
+    careers_url: "https://jobs.ashbyhq.com/AlephAlpha"
+    ats_provider: "ashby"
+    ats_region: "global"
+    ats_slug: "AlephAlpha"
+    api_url: "https://api.ashbyhq.com/posting-api/job-board/AlephAlpha?includeCompensation=true"
+    job_url_field: "jobUrl"
+    job_id_field: "id"
+    date_fields: ["publishedAt", "updatedAt"]
+    dedup_key: "ashby:AlephAlpha:{id}"
+    industries: ["AI", "Applied AI"]
+    stages: ["growth"]
+    roleKeywords: ["AI", "ML", "Applied AI", "Product", "Research"]
+    confidence: "high"
+    notes: "German AI company; strong API-first source."
+
+  - name: "DeepL"
+    market: "Germany"
+    careers_url: "https://jobs.ashbyhq.com/DeepL"
+    ats_provider: "ashby"
+    ats_region: "global"
+    ats_slug: "DeepL"
+    api_url: "https://api.ashbyhq.com/posting-api/job-board/DeepL?includeCompensation=true"
+    job_url_field: "jobUrl"
+    job_id_field: "id"
+    date_fields: ["publishedAt", "updatedAt"]
+    dedup_key: "ashby:DeepL:{id}"
+    industries: ["AI", "Language AI", "SaaS"]
+    stages: ["growth"]
+    roleKeywords: ["AI", "ML", "Product", "Solutions", "Engineering"]
+    confidence: "high"
+    notes: "Cologne/Berlin AI source with strong Germany relevance."
+
+  - name: "Black Forest Labs"
+    market: "Germany"
+    careers_url: "https://job-boards.greenhouse.io/blackforestlabs"
+    ats_provider: "greenhouse"
+    ats_region: "global"
+    ats_slug: "blackforestlabs"
+    api_url: "https://boards-api.greenhouse.io/v1/boards/blackforestlabs/jobs?content=true"
+    job_url_field: "absolute_url"
+    job_id_field: "id"
+    date_fields: ["updated_at"]
+    dedup_key: "greenhouse:blackforestlabs:{id}"
+    industries: ["AI", "Generative AI"]
+    stages: ["growth"]
+    roleKeywords: ["AI", "ML", "Research", "Applied AI", "Infrastructure"]
+    confidence: "high"
+    notes: "Freiburg-based AI model company."
+
+  - name: "Helsing"
+    market: "Germany"
+    careers_url: "https://job-boards.greenhouse.io/helsing"
+    ats_provider: "greenhouse"
+    ats_region: "global"
+    ats_slug: "helsing"
+    api_url: "https://boards-api.greenhouse.io/v1/boards/helsing/jobs?content=true"
+    job_url_field: "absolute_url"
+    job_id_field: "id"
+    date_fields: ["updated_at"]
+    dedup_key: "greenhouse:helsing:{id}"
+    industries: ["AI", "Defense Tech"]
+    stages: ["growth"]
+    roleKeywords: ["AI", "Deployed Engineering", "Product", "Robotics", "Safety"]
+    confidence: "medium"
+    notes: "Research sources disagreed on surface provider; keep monitored."
+
+  - name: "Parloa"
+    market: "Germany"
+    careers_url: "https://job-boards.greenhouse.io/parloa"
+    ats_provider: "greenhouse"
+    ats_region: "global"
+    ats_slug: "parloa"
+    api_url: "https://boards-api.greenhouse.io/v1/boards/parloa/jobs?content=true"
+    job_url_field: "absolute_url"
+    job_id_field: "id"
+    date_fields: ["updated_at"]
+    dedup_key: "greenhouse:parloa:{id}"
+    industries: ["AI", "Contact Center AI", "SaaS"]
+    stages: ["growth"]
+    roleKeywords: ["AI", "Solutions", "Forward Deployed", "Product", "Security"]
+    confidence: "high"
+    notes: "High-value source for AI, solutions, and forward-deployed roles."
+
+  - name: "Langfuse"
+    market: "Germany"
+    careers_url: "https://jobs.ashbyhq.com/langfuse"
+    ats_provider: "ashby"
+    ats_region: "global"
+    ats_slug: "langfuse"
+    api_url: "https://api.ashbyhq.com/posting-api/job-board/langfuse?includeCompensation=true"
+    job_url_field: "jobUrl"
+    job_id_field: "id"
+    date_fields: ["publishedAt", "updatedAt"]
+    dedup_key: "ashby:langfuse:{id}"
+    industries: ["AI", "Developer Tools", "LLMOps"]
+    stages: ["growth"]
+    roleKeywords: ["LLMOps", "DevTools", "Forward Deployed", "DevRel", "Product"]
+    confidence: "high"
+    notes: "Added from second research report; strong Berlin/Munich DevTools fit."
+
+  - name: "Lakera"
+    market: "Germany"
+    careers_url: "https://jobs.ashbyhq.com/lakera.ai"
+    ats_provider: "ashby"
+    ats_region: "global"
+    ats_slug: "lakera.ai"
+    api_url: "https://api.ashbyhq.com/posting-api/job-board/lakera.ai?includeCompensation=true"
+    job_url_field: "jobUrl"
+    job_id_field: "id"
+    date_fields: ["publishedAt", "updatedAt"]
+    dedup_key: "ashby:lakera.ai:{id}"
+    industries: ["AI", "Security"]
+    stages: ["growth"]
+    roleKeywords: ["AI Security", "Solutions", "GTM", "Product"]
+    confidence: "high"
+    notes: "Use location filters carefully; role geographies vary."
+
+  - name: "n8n"
+    market: "Germany"
+    careers_url: "https://jobs.ashbyhq.com/n8n"
+    ats_provider: "ashby"
+    ats_region: "global"
+    ats_slug: "n8n"
+    api_url: "https://api.ashbyhq.com/posting-api/job-board/n8n?includeCompensation=true"
+    job_url_field: "jobUrl"
+    job_id_field: "id"
+    date_fields: ["publishedAt", "updatedAt"]
+    dedup_key: "ashby:n8n:{id}"
+    industries: ["Automation", "SaaS", "AI"]
+    stages: ["growth"]
+    roleKeywords: ["Automation", "Internal Tools", "GTM", "Solutions", "Support"]
+    confidence: "high"
+    notes: "Very strong fit for automation and internal-tools roles."
+
+  - name: "Contentful"
+    market: "Germany"
+    careers_url: "https://job-boards.greenhouse.io/contentful"
+    ats_provider: "greenhouse"
+    ats_region: "global"
+    ats_slug: "contentful"
+    api_url: "https://boards-api.greenhouse.io/v1/boards/contentful/jobs?content=true"
+    job_url_field: "absolute_url"
+    job_id_field: "id"
+    date_fields: ["updated_at"]
+    dedup_key: "greenhouse:contentful:{id}"
+    industries: ["B2B SaaS", "Developer Tools"]
+    stages: ["growth", "enterprise"]
+    roleKeywords: ["Product", "Solutions", "Architecture", "Developer Tools"]
+    confidence: "high"
+    notes: "Berlin enterprise SaaS source from the second research report."
+
+  - name: "Celonis"
+    market: "Germany"
+    careers_url: "https://careers.celonis.com/join-us/open-positions"
+    ats_provider: "greenhouse"
+    ats_region: "global"
+    ats_slug: "celonis"
+    api_url: "https://boards-api.greenhouse.io/v1/boards/celonis/jobs?content=true"
+    job_url_field: "absolute_url"
+    job_id_field: "id"
+    date_fields: ["updated_at"]
+    dedup_key: "greenhouse:celonis:{id}"
+    industries: ["B2B SaaS", "Process Mining", "AI"]
+    stages: ["growth", "enterprise"]
+    roleKeywords: ["Applied AI", "Product", "Solutions", "Enterprise Architecture"]
+    confidence: "medium"
+    notes: "Research sources disagreed on provider; keep monitored."
+
+  - name: "Taxfix"
+    market: "Germany"
+    careers_url: "https://jobs.ashbyhq.com/taxfix.com"
+    ats_provider: "ashby"
+    ats_region: "global"
+    ats_slug: "taxfix.com"
+    api_url: "https://api.ashbyhq.com/posting-api/job-board/taxfix.com?includeCompensation=true"
+    job_url_field: "jobUrl"
+    job_id_field: "id"
+    date_fields: ["publishedAt", "updatedAt"]
+    dedup_key: "ashby:taxfix.com:{id}"
+    industries: ["Fintech", "SaaS"]
+    stages: ["growth"]
+    roleKeywords: ["Product", "Data", "Platform", "Internal Ops"]
+    confidence: "high"
+    notes: "German fintech source with clean Ashby structure."
+
+  - name: "N26"
+    market: "Germany"
+    careers_url: "https://job-boards.greenhouse.io/n26"
+    ats_provider: "greenhouse"
+    ats_region: "global"
+    ats_slug: "n26"
+    api_url: "https://boards-api.greenhouse.io/v1/boards/n26/jobs?content=true"
+    job_url_field: "absolute_url"
+    job_id_field: "id"
+    date_fields: ["updated_at"]
+    dedup_key: "greenhouse:n26:{id}"
+    industries: ["Fintech", "Consumer Tech"]
+    stages: ["growth", "enterprise"]
+    roleKeywords: ["Product", "Platform", "Data", "Internal Systems"]
+    confidence: "medium"
+    notes: "Useful Berlin fintech source; verify volume periodically."
+
+  - name: "Trade Republic"
+    market: "Germany"
+    careers_url: "https://job-boards.greenhouse.io/traderepublic"
+    ats_provider: "greenhouse"
+    ats_region: "global"
+    ats_slug: "traderepublic"
+    api_url: "https://boards-api.greenhouse.io/v1/boards/traderepublic/jobs?content=true"
+    job_url_field: "absolute_url"
+    job_id_field: "id"
+    date_fields: ["updated_at"]
+    dedup_key: "greenhouse:traderepublic:{id}"
+    industries: ["Fintech"]
+    stages: ["growth"]
+    roleKeywords: ["Product", "Ops", "Data", "Finance Tech", "Internal Systems"]
+    confidence: "medium"
+    notes: "Clean Greenhouse source; monitor current volume."
+
+  - name: "Raisin"
+    market: "Germany"
+    careers_url: "https://job-boards.greenhouse.io/raisin"
+    ats_provider: "greenhouse"
+    ats_region: "global"
+    ats_slug: "raisin"
+    api_url: "https://boards-api.greenhouse.io/v1/boards/raisin/jobs?content=true"
+    job_url_field: "absolute_url"
+    job_id_field: "id"
+    date_fields: ["updated_at"]
+    dedup_key: "greenhouse:raisin:{id}"
+    industries: ["Fintech", "SaaS"]
+    stages: ["growth"]
+    roleKeywords: ["Product", "Tooling", "Analytics", "Ops"]
+    confidence: "high"
+    notes: "Good Berlin/Frankfurt/Hamburg/Munich coverage."
+
+  - name: "GetYourGuide"
+    market: "Germany"
+    careers_url: "https://job-boards.greenhouse.io/getyourguide"
+    ats_provider: "greenhouse"
+    ats_region: "global"
+    ats_slug: "getyourguide"
+    api_url: "https://boards-api.greenhouse.io/v1/boards/getyourguide/jobs?content=true"
+    job_url_field: "absolute_url"
+    job_id_field: "id"
+    date_fields: ["updated_at"]
+    dedup_key: "greenhouse:getyourguide:{id}"
+    industries: ["Travel Tech", "Consumer Tech"]
+    stages: ["growth"]
+    roleKeywords: ["Product", "Engineering", "Data", "Content AI", "RevOps"]
+    confidence: "high"
+    notes: "Strong Berlin travel-tech source."
+
+  - name: "HelloFresh"
+    market: "Germany"
+    careers_url: "https://job-boards.greenhouse.io/hellofresh"
+    ats_provider: "greenhouse"
+    ats_region: "global"
+    ats_slug: "hellofresh"
+    api_url: "https://boards-api.greenhouse.io/v1/boards/hellofresh/jobs?content=true"
+    job_url_field: "absolute_url"
+    job_id_field: "id"
+    date_fields: ["updated_at"]
+    dedup_key: "greenhouse:hellofresh:{id}"
+    industries: ["Consumer Tech", "Logistics Tech"]
+    stages: ["enterprise"]
+    roleKeywords: ["Systems", "RevOps", "Data", "Product", "Automation"]
+    confidence: "high"
+    notes: "Strict title filters needed to avoid warehouse/non-target roles."
+
+  - name: "Scout24"
+    market: "Germany"
+    careers_url: "https://job-boards.greenhouse.io/autoscout24"
+    ats_provider: "greenhouse"
+    ats_region: "global"
+    ats_slug: "autoscout24"
+    api_url: "https://boards-api.greenhouse.io/v1/boards/autoscout24/jobs?content=true"
+    job_url_field: "absolute_url"
+    job_id_field: "id"
+    date_fields: ["updated_at"]
+    dedup_key: "greenhouse:autoscout24:{id}"
+    industries: ["Marketplace", "Data"]
+    stages: ["enterprise"]
+    roleKeywords: ["ML", "Data", "Product", "Platform"]
+    confidence: "high"
+    notes: "Legacy board token is autoscout24."
+
+  - name: "IDnow"
+    market: "Germany"
+    careers_url: "https://job-boards.eu.greenhouse.io/idnow"
+    ats_provider: "greenhouse"
+    ats_region: "eu"
+    ats_slug: "idnow"
+    api_url: "https://boards-api.greenhouse.io/v1/boards/idnow/jobs?content=true"
+    job_url_field: "absolute_url"
+    job_id_field: "id"
+    date_fields: ["updated_at"]
+    dedup_key: "greenhouse:idnow:{id}"
+    industries: ["Identity", "Security", "AI"]
+    stages: ["growth"]
+    roleKeywords: ["AI", "ML", "Product", "Transformation"]
+    confidence: "high"
+    notes: "EU Greenhouse hosted board; API pattern appears compatible."
+
+  - name: "Vercel"
+    market: "Germany"
+    careers_url: "https://job-boards.greenhouse.io/vercel"
+    ats_provider: "greenhouse"
+    ats_region: "global"
+    ats_slug: "vercel"
+    api_url: "https://boards-api.greenhouse.io/v1/boards/vercel/jobs?content=true"
+    job_url_field: "absolute_url"
+    job_id_field: "id"
+    date_fields: ["updated_at"]
+    dedup_key: "greenhouse:vercel:{id}"
+    industries: ["Developer Tools", "SaaS"]
+    stages: ["growth"]
+    roleKeywords: ["Support", "Solutions", "Platform", "Customer Engineering", "GTM"]
+    confidence: "high"
+    notes: "Strong remote-Germany signal; location strings can combine UK and Germany."
+
+  - name: "Supabase"
+    market: "Germany"
+    careers_url: "https://jobs.ashbyhq.com/supabase"
+    ats_provider: "ashby"
+    ats_region: "global"
+    ats_slug: "supabase"
+    api_url: "https://api.ashbyhq.com/posting-api/job-board/supabase?includeCompensation=true"
+    job_url_field: "jobUrl"
+    job_id_field: "id"
+    date_fields: ["publishedAt", "updatedAt"]
+    dedup_key: "ashby:supabase:{id}"
+    industries: ["Developer Tools", "SaaS"]
+    stages: ["growth"]
+    roleKeywords: ["Solutions", "Support", "GTM", "Product", "Developer Tools"]
+    confidence: "medium"
+    notes: "Research sources disagreed on surface; Ashby endpoint kept as API-ready with monitoring."
+
+  - name: "OpenAI"
+    market: "EMEA"
+    careers_url: "https://jobs.ashbyhq.com/openai"
+    ats_provider: "ashby"
+    ats_region: "global"
+    ats_slug: "openai"
+    api_url: "https://api.ashbyhq.com/posting-api/job-board/openai?includeCompensation=true"
+    job_url_field: "jobUrl"
+    job_id_field: "id"
+    date_fields: ["publishedAt", "updatedAt"]
+    dedup_key: "ashby:openai:{id}"
+    industries: ["AI"]
+    stages: ["enterprise", "growth"]
+    roleKeywords: ["AI", "GTM", "Forward Deployed", "Solutions", "Product"]
+    confidence: "high"
+    notes: "Filter strongly for EMEA, Europe, London, Munich, or remote-Europe availability."
+
+  - name: "Anthropic"
+    market: "EMEA"
+    careers_url: "https://job-boards.greenhouse.io/anthropic"
+    ats_provider: "greenhouse"
+    ats_region: "global"
+    ats_slug: "anthropic"
+    api_url: "https://boards-api.greenhouse.io/v1/boards/anthropic/jobs?content=true"
+    job_url_field: "absolute_url"
+    job_id_field: "id"
+    date_fields: ["updated_at"]
+    dedup_key: "greenhouse:anthropic:{id}"
+    industries: ["AI"]
+    stages: ["growth"]
+    roleKeywords: ["AI", "Engineering", "Product", "Data"]
+    confidence: "high"
+    notes: "EU location nesting may require broad location matching."
+
+  - name: "Cohere"
+    market: "EMEA"
+    careers_url: "https://jobs.ashbyhq.com/cohere"
+    ats_provider: "ashby"
+    ats_region: "global"
+    ats_slug: "cohere"
+    api_url: "https://api.ashbyhq.com/posting-api/job-board/cohere?includeCompensation=true"
+    job_url_field: "jobUrl"
+    job_id_field: "id"
+    date_fields: ["publishedAt", "updatedAt"]
+    dedup_key: "ashby:cohere:{id}"
+    industries: ["AI"]
+    stages: ["growth"]
+    roleKeywords: ["AI", "Forward Deployed", "Security", "Customer Engineering", "Solutions"]
+    confidence: "high"
+    notes: "Good remote-Europe AI source."
+
+  - name: "Pinecone"
+    market: "EMEA"
+    careers_url: "https://jobs.ashbyhq.com/pinecone"
+    ats_provider: "ashby"
+    ats_region: "global"
+    ats_slug: "pinecone"
+    api_url: "https://api.ashbyhq.com/posting-api/job-board/pinecone?includeCompensation=true"
+    job_url_field: "jobUrl"
+    job_id_field: "id"
+    date_fields: ["publishedAt", "updatedAt"]
+    dedup_key: "ashby:pinecone:{id}"
+    industries: ["AI", "Developer Tools", "Data"]
+    stages: ["growth"]
+    roleKeywords: ["AI", "Data", "DevTools", "Engineering", "Product"]
+    confidence: "high"
+    notes: "Verify EMEA listings through location fields."
+
+  - name: "ElevenLabs"
+    market: "EMEA"
+    careers_url: "https://jobs.ashbyhq.com/elevenlabs"
+    ats_provider: "ashby"
+    ats_region: "global"
+    ats_slug: "elevenlabs"
+    api_url: "https://api.ashbyhq.com/posting-api/job-board/elevenlabs?includeCompensation=true"
+    job_url_field: "jobUrl"
+    job_id_field: "id"
+    date_fields: ["publishedAt", "updatedAt"]
+    dedup_key: "ashby:elevenlabs:{id}"
+    industries: ["AI", "Audio AI"]
+    stages: ["growth"]
+    roleKeywords: ["AI", "Solutions", "Forward Deployed", "Customer Success", "Product"]
+    confidence: "high"
+    notes: "High-value Europe/Germany source for AI and solutions roles."
+
+  - name: "Synthesia"
+    market: "EMEA"
+    careers_url: "https://jobs.ashbyhq.com/synthesia"
+    ats_provider: "ashby"
+    ats_region: "global"
+    ats_slug: "synthesia"
+    api_url: "https://api.ashbyhq.com/posting-api/job-board/synthesia?includeCompensation=true"
+    job_url_field: "jobUrl"
+    job_id_field: "id"
+    date_fields: ["publishedAt", "updatedAt"]
+    dedup_key: "ashby:synthesia:{id}"
+    industries: ["AI", "Video AI", "SaaS"]
+    stages: ["growth"]
+    roleKeywords: ["AI", "Solutions", "Customer Success", "Product"]
+    confidence: "high"
+    notes: "Strong DACH signal and Berlin/Munich presence in research."
+
+  - name: "Perplexity"
+    market: "EMEA"
+    careers_url: "https://jobs.ashbyhq.com/perplexity"
+    ats_provider: "ashby"
+    ats_region: "global"
+    ats_slug: "perplexity"
+    api_url: "https://api.ashbyhq.com/posting-api/job-board/perplexity?includeCompensation=true"
+    job_url_field: "jobUrl"
+    job_id_field: "id"
+    date_fields: ["publishedAt", "updatedAt"]
+    dedup_key: "ashby:perplexity:{id}"
+    industries: ["AI", "Search"]
+    stages: ["growth"]
+    roleKeywords: ["AI", "Product", "Engineering"]
+    confidence: "high"
+    notes: "Filter for EU timezone and remote-Europe language."
+
+  - name: "Miro"
+    market: "Germany"
+    careers_url: "https://job-boards.greenhouse.io/realtimeboardglobal"
+    ats_provider: "greenhouse"
+    ats_region: "global"
+    ats_slug: "realtimeboardglobal"
+    api_url: "https://boards-api.greenhouse.io/v1/boards/realtimeboardglobal/jobs?content=true"
+    job_url_field: "absolute_url"
+    job_id_field: "id"
+    date_fields: ["updated_at"]
+    dedup_key: "greenhouse:realtimeboardglobal:{id}"
+    industries: ["SaaS", "Collaboration"]
+    stages: ["growth", "enterprise"]
+    roleKeywords: ["Product", "Systems", "RevOps", "Platform"]
+    confidence: "high"
+    notes: "Legacy Greenhouse token from research."
+
+  - name: "Upvest"
+    market: "Germany"
+    careers_url: "https://jobs.ashbyhq.com/upvest"
+    ats_provider: "ashby"
+    ats_region: "global"
+    ats_slug: "upvest"
+    api_url: "https://api.ashbyhq.com/posting-api/job-board/upvest?includeCompensation=true"
+    job_url_field: "jobUrl"
+    job_id_field: "id"
+    date_fields: ["publishedAt", "updatedAt"]
+    dedup_key: "ashby:upvest:{id}"
+    industries: ["Fintech", "API"]
+    stages: ["growth"]
+    roleKeywords: ["API", "Solutions", "Data", "Product"]
+    confidence: "high"
+    notes: "DACH embedded-finance source from second research report."
+
+  - name: "Clarisights"
+    market: "EMEA"
+    careers_url: "https://jobs.ashbyhq.com/clarisights"
+    ats_provider: "ashby"
+    ats_region: "global"
+    ats_slug: "clarisights"
+    api_url: "https://api.ashbyhq.com/posting-api/job-board/clarisights?includeCompensation=true"
+    job_url_field: "jobUrl"
+    job_id_field: "id"
+    date_fields: ["publishedAt", "updatedAt"]
+    dedup_key: "ashby:clarisights:{id}"
+    industries: ["Analytics", "Data"]
+    stages: ["growth"]
+    roleKeywords: ["Forward Deployed", "GTM", "Solutions", "Analytics"]
+    confidence: "high"
+    notes: "Specialized analytics integrations source."
+
+  - name: "Lovehoney Group"
+    market: "Germany"
+    careers_url: "https://jobs.eu.lever.co/lovehoneygroup"
+    ats_provider: "lever"
+    ats_region: "eu"
+    ats_slug: "lovehoneygroup"
+    api_url: "https://api.eu.lever.co/v0/postings/lovehoneygroup?mode=json"
+    job_url_field: "hostedUrl"
+    job_id_field: "id"
+    date_fields: ["createdAt"]
+    dedup_key: "lever:lovehoneygroup:{id}"
+    industries: ["E-commerce", "Consumer Tech"]
+    stages: ["enterprise"]
+    roleKeywords: ["Product", "Data", "Systems"]
+    confidence: "high"
+    notes: "Lever EU deployment from second research report."
+
+  - name: "Sport Alliance"
+    market: "Germany"
+    careers_url: "https://jobs.eu.lever.co/sportalliance"
+    ats_provider: "lever"
+    ats_region: "eu"
+    ats_slug: "sportalliance"
+    api_url: "https://api.eu.lever.co/v0/postings/sportalliance?mode=json"
+    job_url_field: "hostedUrl"
+    job_id_field: "id"
+    date_fields: ["createdAt"]
+    dedup_key: "lever:sportalliance:{id}"
+    industries: ["SaaS", "Sports Tech"]
+    stages: ["growth"]
+    roleKeywords: ["RevOps", "Data", "Ops", "AI-adjacent"]
+    confidence: "high"
+    notes: "Germany-remote Lever EU source."
+
+  - name: "Saviynt"
+    market: "Germany"
+    careers_url: "https://jobs.lever.co/saviynt"
+    ats_provider: "lever"
+    ats_region: "global"
+    ats_slug: "saviynt"
+    api_url: "https://api.lever.co/v0/postings/saviynt?mode=json"
+    job_url_field: "hostedUrl"
+    job_id_field: "id"
+    date_fields: ["createdAt"]
+    dedup_key: "lever:saviynt:{id}"
+    industries: ["Security", "Enterprise SaaS"]
+    stages: ["enterprise"]
+    roleKeywords: ["Solutions Engineer", "DACH", "GTM", "Customer Engineering"]
+    confidence: "high"
+    notes: "Strong role fit for DACH solutions engineering."
+
+  - name: "Datapao"
+    market: "Germany"
+    careers_url: "https://job-boards.eu.greenhouse.io/datapao"
+    ats_provider: "greenhouse"
+    ats_region: "eu"
+    ats_slug: "datapao"
+    api_url: "https://boards-api.greenhouse.io/v1/boards/datapao/jobs?content=true"
+    job_url_field: "absolute_url"
+    job_id_field: "id"
+    date_fields: ["updated_at"]
+    dedup_key: "greenhouse:datapao:{id}"
+    industries: ["Data", "Consulting"]
+    stages: ["growth"]
+    roleKeywords: ["Data", "Engineering", "Consulting"]
+    confidence: "high"
+    notes: "Niche data firm from second research report."
+
+backlog_companies:
+  - name: "sennder"
+    careers_url: "https://www.sennder.com/open-positions"
+    detected_provider: "smartrecruiters"
+    reason: "Valuable Germany employer; add once SmartRecruiters parser is enabled."
+    priority: "high"
+  - name: "Delivery Hero"
+    careers_url: "https://careers.deliveryhero.com/deliveryhero-jobs"
+    detected_provider: "custom"
+    reason: "Important Berlin employer; custom/Workday-like discovery needs browser validation."
+    priority: "high"
+  - name: "SumUp"
+    careers_url: "https://www.sumup.com/careers/positions/"
+    detected_provider: "custom"
+    reason: "High-value German fintech; needs browser/network discovery."
+    priority: "high"
+  - name: "Forto"
+    careers_url: "https://careers.forto.com/forto-jobs/"
+    detected_provider: "custom"
+    reason: "Relevant Berlin/Hamburg logistics-tech source; no direct public feed confirmed."
+    priority: "high"
+  - name: "Personio"
+    careers_url: "https://www.personio.com/about-personio/careers/"
+    detected_provider: "personio_custom"
+    reason: "Major DACH employer; research disagreed on public feed reliability."
+    priority: "high"
+  - name: "Zalando"
+    careers_url: "https://jobs.zalando.com"
+    detected_provider: "workday"
+    reason: "Largest Berlin tech employer; Workday/custom discovery should be separate from API-first v1."
+    priority: "high"
+  - name: "Mistral AI"
+    careers_url: "https://mistral.ai/careers"
+    detected_provider: "custom"
+    reason: "European AI champion but weaker Germany specificity and non-clean v1 API surface."
+    priority: "medium"
+  - name: "Weights & Biases"
+    careers_url: "https://wandb.ai/site/careers"
+    detected_provider: "unknown"
+    reason: "Research suggested Greenhouse/Lever, but live public API checks returned 404 on 2026-04-19."
+    priority: "medium"
+  - name: "Cognigy"
+    careers_url: "https://careers.cognigy.com"
+    detected_provider: "softgarden"
+    reason: "Relevant AI automation company; requires Softgarden/browser handling."
+    priority: "medium"
+  - name: "Pitch"
+    careers_url: "https://pitch.com/jobs"
+    detected_provider: "custom"
+    reason: "Relevant Berlin product-led company; needs custom discovery."
+    priority: "medium"

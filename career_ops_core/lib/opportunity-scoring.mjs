@@ -35,16 +35,48 @@ function uniqueStrings(values = []) {
   return [...new Set(values.filter(Boolean).map((value) => String(value).trim()).filter(Boolean))];
 }
 
-function includesAny(text, values = []) {
-  const lower = text.toLowerCase();
-  return values.some((value) => lower.includes(String(value).toLowerCase()));
+function countMatches(text, values = []) {
+  return values.reduce((count, value) => (
+    keywordMatches(text, value) ? count + 1 : count
+  ), 0);
 }
 
-function countMatches(text, values = []) {
-  const lower = text.toLowerCase();
-  return values.reduce((count, value) => (
-    lower.includes(String(value).toLowerCase()) ? count + 1 : count
-  ), 0);
+function normalizeMatchText(value = "") {
+  return String(value || "")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function keywordMatches(text = "", keyword = "") {
+  const normalizedText = normalizeMatchText(text);
+  const normalizedKeyword = normalizeMatchText(keyword);
+  if (!normalizedText || !normalizedKeyword) return false;
+
+  return ` ${normalizedText} `.includes(` ${normalizedKeyword} `);
+}
+
+function expandedGeographyTerms(countries = [], cities = []) {
+  const terms = [...countries, ...cities];
+  const normalizedCountries = countries.map((country) => normalizeMatchText(country));
+  if (normalizedCountries.includes("germany") || normalizedCountries.includes("deutschland")) {
+    terms.push(
+      "Deutschland",
+      "DACH",
+      "Europe",
+      "EU",
+      "EMEA",
+      "Remote Germany",
+      "Remote EU",
+      "Remote Europe",
+      "Remote EMEA",
+    );
+  }
+  return uniqueStrings(terms);
 }
 
 function normalizeSeniority(value = "") {
@@ -122,15 +154,14 @@ function extractLanguageRequirements(opportunity = {}, limitations = {}) {
 }
 
 function geographyMismatch(opportunity = {}, preferences = {}) {
-  const countries = (preferences.geography?.countries || []).map((item) => String(item).toLowerCase());
-  const cities = (preferences.geography?.cities || []).map((item) => String(item).toLowerCase());
+  const countries = preferences.geography?.countries || [];
+  const cities = preferences.geography?.cities || [];
   const remotePolicy = String(preferences.geography?.remotePolicy || "remote").toLowerCase();
-  const location = `${opportunity.location || ""} ${opportunity.description || ""}`.toLowerCase();
+  const location = `${opportunity.location || ""} ${opportunity.description || ""}`;
 
-  if (remotePolicy === "remote" && /\bremote\b/.test(location)) return false;
   if (countries.length === 0 && cities.length === 0) return false;
-  if (cities.some((city) => location.includes(city))) return false;
-  if (countries.some((country) => location.includes(country))) return false;
+  if (expandedGeographyTerms(countries, cities).some((term) => keywordMatches(location, term))) return false;
+  if (remotePolicy === "remote" && /\bremote\b/i.test(location) && countries.length === 0 && cities.length === 0) return false;
   return true;
 }
 
@@ -138,8 +169,8 @@ function unavailableCountryMismatch(opportunity = {}, limitations = {}) {
   const unavailableCountries = (limitations.unavailableCountries || []).map((item) => String(item).toLowerCase());
   if (unavailableCountries.length === 0) return false;
 
-  const location = `${opportunity.location || ""} ${opportunity.description || ""}`.toLowerCase();
-  return unavailableCountries.some((country) => location.includes(country));
+  const location = `${opportunity.location || ""} ${opportunity.description || ""}`;
+  return unavailableCountries.some((country) => keywordMatches(location, country));
 }
 
 function languageMismatch(opportunity = {}, profileFacts = {}) {

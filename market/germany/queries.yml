@@ -1,0 +1,11 @@
+queries:
+  - name: "germany-ashby-ai-solutions"
+    template: 'site:jobs.ashbyhq.com {{location_terms}} "{{role_keyword_1}}" OR "Solutions Engineer" OR "Forward Deployed"'
+  - name: "germany-greenhouse-ai-product"
+    template: 'site:job-boards.greenhouse.io OR site:job-boards.eu.greenhouse.io {{location_terms}} "{{role_keyword_1}}" OR "Product Manager" AI'
+  - name: "germany-lever-solutions-gtm"
+    template: 'site:jobs.lever.co OR site:jobs.eu.lever.co {{location_terms}} "Solutions Engineer" OR "GTM Engineer" OR "RevOps"'
+  - name: "germany-automation-internal-tools"
+    template: '{{location_terms}} "Automation Engineer" OR "Business Systems" OR "Internal Tools" OR "RevOps Engineer"'
+  - name: "dach-forward-deployed"
+    template: 'Germany OR DACH OR EMEA "Forward Deployed Engineer" OR "Deployed Engineer" OR "Customer Engineer"'
