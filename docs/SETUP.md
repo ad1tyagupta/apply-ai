@@ -6,6 +6,8 @@ npx playwright install chromium
 npm run doctor
 ```
 
+`npm run doctor` creates local runtime copies of `config/profile.yml` and `config/user-preferences.yml` from the example files when they are missing. These local files are ignored by Git because they can contain personal data.
+
 Optional checks:
 
 ```bash

@@ -1,8 +1,0 @@
-generatedAt: null
-summary:
-  recommendedRoleCount: 0
-  recommendedCompanyCount: 0
-roles: []
-companies: []
-notes:
-  - "Run `npm run recommend` after onboarding and brain-building to generate user-specific suggestions."

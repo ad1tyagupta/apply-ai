@@ -6,6 +6,8 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"strings"
+	"unicode"
 
 	tea "github.com/charmbracelet/bubbletea"
 
@@ -106,18 +108,12 @@ func (m appModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case screens.PipelineOpenURLMsg:
-		url := msg.URL
+		rawURL := msg.URL
 		return m, func() tea.Msg {
-			var cmd *exec.Cmd
-			switch runtime.GOOS {
-			case "darwin":
-				cmd = exec.Command("open", url)
-			case "linux":
-				cmd = exec.Command("xdg-open", url)
-			case "windows":
-				cmd = exec.Command("cmd", "/c", "start", "", url)
-			default:
-				cmd = exec.Command("xdg-open", url)
+			cmd, ok := openURLCommand(rawURL, runtime.GOOS)
+			if !ok {
+				fmt.Fprintf(os.Stderr, "WARN: refused to open unsupported URL: %q\n", rawURL)
+				return nil
 			}
 			_ = cmd.Run()
 			return nil
@@ -138,6 +134,57 @@ func (m appModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.pipeline = pm
 		return m, cmd
 	}
+}
+
+func openURLCommand(rawURL string, goos string) (*exec.Cmd, bool) {
+	cleaned := strings.TrimSpace(rawURL)
+	if !isSafeHTTPURL(cleaned) {
+		return nil, false
+	}
+
+	switch goos {
+	case "darwin":
+		return exec.Command("open", cleaned), true
+	case "linux":
+		return exec.Command("xdg-open", cleaned), true
+	case "windows":
+		return exec.Command("rundll32", "url.dll,FileProtocolHandler", cleaned), true
+	default:
+		return exec.Command("xdg-open", cleaned), true
+	}
+}
+
+func isSafeHTTPURL(rawURL string) bool {
+	if rawURL == "" {
+		return false
+	}
+	for _, r := range rawURL {
+		if unicode.IsSpace(r) || unicode.IsControl(r) {
+			return false
+		}
+	}
+
+	rest := ""
+	if strings.HasPrefix(rawURL, "https://") {
+		rest = strings.TrimPrefix(rawURL, "https://")
+	} else if strings.HasPrefix(rawURL, "http://") {
+		rest = strings.TrimPrefix(rawURL, "http://")
+	} else {
+		return false
+	}
+
+	hostEnd := strings.IndexAny(rest, "/?#")
+	host := rest
+	if hostEnd >= 0 {
+		host = rest[:hostEnd]
+	}
+	if host == "" {
+		return false
+	}
+	if strings.HasPrefix(host, "[") {
+		return strings.Contains(host, "]")
+	}
+	return !strings.ContainsAny(host, "[]")
 }
 
 func (m appModel) View() string {
