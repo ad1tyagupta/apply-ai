@@ -1,0 +1,1293 @@
+Strategic Evaluation of Applicant Tracking Systems for Programmatic Job Discovery in the DACH Market
+Executive Summary
+The programmatic aggregation and evaluation of career opportunities within the DACH (Germany, Austria, Switzerland) region require a highly nuanced understanding of modern Applicant Tracking System (ATS) architectures. This report presents an exhaustive technical evaluation of career portal infrastructures utilized by leading technology entities operating in Germany, focusing specifically on the artificial intelligence, automation, business-to-business (B2B) Software-as-a-Service (SaaS), and product-led growth sectors. The objective is to provide the foundational data structures and integration patterns necessary for an automated job discovery tool to ingest, parse, and filter high-quality active listings without relying on fragile web scraping methodologies or commercial aggregators.
+The analysis encompasses a meticulous review of 38 high-relevance technology organizations operating within or actively recruiting from the DACH market. Of these entities, 25 have been definitively classified as Tier 1 organizations. This classification signifies that they utilize ATS platforms exposing unauthenticated, publicly accessible JSON application programming interface (API) endpoints that are immediately suitable for programmatic ingestion. The distribution of these Tier 1 systems reveals a concentrated reliance on three dominant applicant tracking platforms: Ashby (12 entities), Greenhouse (11 entities), and Lever (2 entities). The accelerated adoption of Ashby among emerging European AI and automation companies indicates a distinct market shift away from legacy systems, whereas established late-stage scale-ups tend to maintain extensive Greenhouse implementations.1
+An additional 13 entities have been classified as Tier 2 or Tier 3 discovery targets. These organizations represent critical nodes within the German technology ecosystem but either utilize closed-ecosystem platforms such as Workday, employ bespoke career pages requiring custom Document Object Model (DOM) parsers, or utilize ATS providers that restrict API access strictly behind token-based authorization protocols.3 While essential for comprehensive market coverage, these entities must be relegated to a secondary development phase involving headless browser automation.
+The primary technical risks identified in this evaluation involve the persistent detection of "ghost jobs" (stale listings intentionally left active by human resources departments to harvest resumes), the extreme complexities of geolocation string parsing for remote-eligible European roles, and the fragmentation of API endpoints caused by regional data residency requirements. Specifically, the bifurcation of Greenhouse and Lever into distinct United States and European Union domains necessitates dynamic routing logic within any robust scanning architecture.6
+The German Talent Ecosystem and Structural Labor Dynamics
+The technology labor market in Germany is highly concentrated in distinct geographical and functional hubs. Berlin serves as the undisputed epicenter for B2C consumer technology, financial technology (fintech), and open-source artificial intelligence development. Conversely, Munich has established itself as the primary hub for deep technology, enterprise B2B SaaS, and industrial automation.6 Understanding this geographic bifurcation is critical for tuning location-based inclusion filters. However, the post-pandemic normalization of distributed work has fundamentally altered how these companies structure their requisitions within their respective applicant tracking systems.
+The Rise of Forward-Deployed and Go-To-Market Engineering
+A significant structural shift in role taxonomy is observable within DACH-based artificial intelligence and automation companies. As highly complex, non-deterministic large language models (LLMs) and agentic workflows enter production environments, the traditional boundary between core software engineering and technical sales has completely dissolved. Organizations such as Parloa, Langfuse, and Clarisights are aggressively expanding their headcount for "Forward Deployed Engineers" (FDE), "GTM Engineers," and "Solutions Architects".6
+These hybrid roles require profound technical competence in software architecture combined with sophisticated client-facing acumen to integrate advanced technologies into legacy enterprise environments. When parsing JSON payloads from ATS APIs, it is a critical engineering caveat to note that these positions are frequently categorized under "Growth," "Commercial," "Customer Success," or "Sales" departments rather than "Engineering".6 A job discovery tool that relies solely on department-level filtering logic will inadvertently exclude these high-value engineering roles. Consequently, semantic title filtering leveraging rigorous positive and negative regular expressions must entirely supersede departmental mapping to ensure optimal signal-to-noise ratios.
+Geolocation Parsing and Remote EMEA Dynamics
+The normalization of remote work has introduced severe complexities into location data structures. Modern organizations do not simply list "Germany" or "Berlin." Instead, ATS API payloads feature nested arrays of location data, presenting highly variable strings such as "Remote - EMEA," "Berlin, Munich, or Remote Germany," "Hybrid - Europe," or "DACH Region".8
+For instance, elite international entities such as OpenAI, Anthropic, and Cohere frequently utilize "Remote - EMEA" or "London/Munich" geographical tags to attract top-tier German engineering talent without requiring formal relocation to the United Kingdom or the United States.8 A robust programmatic scanner must implement sophisticated string matching protocols and fuzzy logic to correctly identify roles that are legally and operationally available to German residents, regardless of the precise string format returned by the underlying ATS API. The exclusion of broader terms like "EMEA" or "Remote Europe" will result in a catastrophic loss of Tier 1 artificial intelligence opportunities.
+Architectural Deep Dive: ATS Job Board Endpoints
+The programmatic retrieval of active job listings relies on systematically exploiting the public-facing application programming interfaces that ATS platforms build to render their own hosted career pages. These endpoints are designed to be consumed by client-side JavaScript on the browser and are therefore completely open, requiring no OAuth workflows, API key authorization, or complex authentication headers.8
+Greenhouse API Architecture and Ingestion Mechanics
+Greenhouse utilizes a highly standardized, predictable RESTful architecture that has become the legacy standard for enterprise tech companies.1 The primary discovery mechanism involves identifying the board_token, which acts as the unique slug for the company. When a company embeds a Greenhouse board on their proprietary career site, the underlying HTTP GET request follows a strict pattern: https://boards-api.greenhouse.io/v1/boards/{board_token}/jobs?content=true.18
+The JSON response generated by this endpoint is relatively flat and highly predictable, bypassing the complexities of pagination entirely by returning the complete array of active requisitions in a single response.8 Within this payload, the id field serves as the immutable unique identifier for the database record. The absolute_url field contains the canonical hyperlink intended for candidate display, which directly routes the user to the application portal.8 Furthermore, Greenhouse exposes an updated_at timestamp for each listing. Extracting and monitoring this temporal data is absolutely critical for calculating listing velocity and detecting stale postings that have languished on the board.
+A vital geographical and legal nuance specific to the European market is the existence of the Greenhouse EU cluster. To strictly comply with the General Data Protection Regulation (GDPR) regarding data sovereignty and cross-border data transfer, several prominent European organizations utilize an isolated infrastructure accessible via eu.greenhouse.io.6 If a known Greenhouse customer (such as Parloa) returns a 404 Not Found error on the standard global domain, the ingestion engine's scanning protocol must automatically catch the exception and iterate to the EU subdomain to resolve the correct payload.6
+Ashby API Architecture and JSON Telemetry
+Ashby has aggressively captured significant market share among high-growth technology startups, positioning itself as the premier ATS for artificial intelligence laboratories and modern SaaS companies due to its integrated analytics, superior user interface, and developer-friendly infrastructure.1 The unauthenticated job board API for Ashby is located at the following endpoint: https://api.ashbyhq.com/posting-api/job-board/{board_name}?includeCompensation=true.8
+The JSON payload returned by Ashby is exceptionally rich and structurally superior to legacy providers. It frequently includes highly structured departmental hierarchies, explicitly formatted remote compensation bands (when available), and robust location arrays that separate primary offices from secondary remote eligibilities.21 The primary identifier is housed within the id field, and the candidate-facing application link is cleanly stored in the jobUrl string. Because Ashby heavily emphasizes custom metadata and granular pipeline tracking, extracting the updatedAt and publishedAt fields provides highly reliable telemetry for tracking the freshness and true age of the requisition. Organizations such as DeepL, Aleph Alpha, n8n, and Langfuse rely entirely on this infrastructure.9
+Lever API Architecture and URL Bifurcation
+Lever’s architecture provides a unified data model that inherently groups job postings by organizational team and geographic location. The public REST endpoint follows a consistent structure: https://api.lever.co/v0/postings/{site}?mode=json.8
+A unique characteristic of the Lever JSON payload is the explicit bifurcation of URLs provided for each listing. The hostedUrl represents the standard public-facing job description page, which includes the company branding, full text description, and the "Apply" button. Conversely, the applyUrl directs the user straight into the raw application form workflow, bypassing the description entirely.8 For job aggregation and discovery tools, hostedUrl is the universally preferred display link, as it provides the necessary context for the candidate. Similar to the Greenhouse infrastructure, Lever operates an entirely isolated European environment accessible via api.eu.lever.co to ensure compliance for specific European clients, such as the Lovehoney Group.7 The timestamp field utilized by Lever is createdAt. This necessitates careful tracking of subsequent local database modifications, as Lever does not consistently expose an unauthenticated updatedAt timestamp on the base board endpoint, making stale job detection slightly more reliant on presence/absence checks.
+Alternative ATS Infrastructures (Tier 2 and Tier 3 Protocols)
+While Greenhouse, Ashby, and Lever dominate the Tier 1 API-ready landscape for venture-backed technology companies, several European entities utilize alternative systems that require distinct ingestion protocols. These platforms dictate the remainder of the German tech market and must be integrated for true exhaustive coverage.
+1. Personio: As a dominant German Human Resources Information System (HRIS), Personio is ubiquitous among "Mittelstand" companies and earlier-stage DACH startups. Personio generates a public JSON feed at https://{company}.jobs.personio.de/search.json (or .com depending on the localization).25 This endpoint is highly advantageous as it returns complete job listings, including the full HTML descriptions, in a single unauthenticated HTTP GET request, bypassing the need for complex pagination logic.26
+2. Recruitee: Another highly popular European applicant tracking system, particularly among mid-market firms. The standard discovery endpoint is located at https://{company}.recruitee.com/api/offers.27 It requires no authentication and provides immediate, unpaginated access to the careers_url alongside structured salary data when provided.27
+3. SmartRecruiters: Widely utilized by massive enterprise scale-ups that require deeply integrated pre-hire workflows. The unauthenticated job feed can be programmatically accessed via https://api.smartrecruiters.com/v1/companies/{companyIdentifier}/postings.29 The payload contains a jobAdUrl and cleanly structured location objects that simplify geographic filtering.30
+4. Workable: While Workable's official v3 API strictly requires a Bearer token for access 4, their embedded career page widget architecture exposes an unauthenticated, undocumented endpoint at https://apply.workable.com/api/v1/widget/accounts/{clientname}.21 This represents a critical backdoor for automated ingestion without requiring formal API partnerships.
+5. Teamtailor: Highly prevalent in the Nordic and DACH startup ecosystems. Unfortunately, the Teamtailor REST API at api.teamtailor.com/v1/jobs strictly enforces token-based authentication.3 For unauthenticated access, discovery tools must rely on the XML feed or coordinate HTTP webhooks 33, making it a Tier 2 priority.
+6. Workday: Workday presents an absolute "black hole" for programmatic ingestion. It relies on internal, highly complex XML structures or deeply nested, authenticated JSON payloads generated by heavily obfuscated React front-ends. Enterprises utilizing Workday (such as Delivery Hero and Zalando) actively resist scraping and must be parsed via heavy browser automation (e.g., Playwright or Puppeteer) or ignored entirely in version one of a discovery tool to conserve engineering resources.5
+Data Engineering for Programmatic Ingestion and Resilience
+To build a resilient and reliable job discovery tool, the underlying architecture must move beyond simple JSON parsing and implement robust data normalization techniques to maintain data integrity over time.
+Canonical Deduplication Keys
+Because human resources personnel frequently rename job titles to optimize for external job boards (e.g., changing "Software Engineer - AI" to "Senior AI Engineer" or "Applied AI Engineer") or update descriptions to refine search engine optimization, relying on a cryptographic hash of the job title, description, or URL is highly susceptible to duplication errors. If the URL parameters change, a naive ingestion engine will interpret the modified listing as a brand new job, leading to database bloat and degraded user trust.17
+The absolute most reliable mechanism for tracking a job's lifecycle across multiple API polls is the construction of a canonical deduplication key based strictly on the ATS provider, the unique board identifier, and the immutable primary key assigned by the source database.8 The standard nomenclature for this string should follow the exact pattern: provider:board_slug:id. For example, an Aleph Alpha listing pulled from Ashby should be permanently indexed as ashby:aleph:{id}. This deterministic logic ensures that even if the marketing parameters change or the job is re-categorized into a different department, the database recognizes the entity as a single, continuous requisition.
+Mitigating the Stale Listing Risk (The Ghost Job Problem)
+A pervasive and well-documented issue in the current technology labor market is the phenomenon of "ghost jobs"—requisitions that remain active on the career portal despite the hiring manager having paused the search, lost headcount budget, or already entered the final offer stages with a candidate. Displaying these dead links destroys the credibility of a job discovery tool.
+To algorithmically mitigate this, the ingestion engine must continuously poll and record the updated_at or createdAt fields provided in the JSON payloads.8 A sophisticated data pipeline involves calculating the delta between the current system timestamp and the last modification date. Listings exceeding a strict 60-day threshold without an update should be aggressively deprioritized in the user interface or explicitly flagged with a "stale risk" warning.
+Furthermore, the engine must perform full-sync reconciliations on a daily basis. Since endpoints like Greenhouse and Ashby return the entire list of active jobs, if a previously indexed deduplication key is suddenly absent from the most recent JSON payload, the job must be immediately marked as closed or archived in the local database. Relying on webhook deletion events is unreliable without a formal partnership; state comparison is mandatory.
+Link Reliability and Marketing Attribution Stripping
+Certain technology organizations utilize customized routing logic that redirects traffic from a raw ATS subdomain to a proprietary domain (e.g., redirecting boards.greenhouse.io/company/job/123 to careers.company.com/openings?gh_jid=123). While the API JSON endpoint provides the ATS-hosted URL (absolute_url or hostedUrl), utilizing this raw link may result in tracking parameter loss or suboptimal user experiences if the company has poorly configured their DNS.8
+The ingestion engine should theoretically verify the terminal HTTP status code of the provided URLs. However, for a Version 1 launch, directly rendering the ATS-provided URL guarantees the highest probability of bypassing broken marketing redirects and 404 errors caused by website migrations. The tool should strip tracking parameters (?gh_src=) from the URL prior to database insertion to maintain clean data structures.
+Table 1: API-Ready Company Registry
+The following table constitutes a verified, exhaustive registry of highly relevant technology companies actively utilizing ATS platforms with documented, public-facing endpoints. This structured data provides the immediate operational foundation for plugging into a programmatic scanner. The focus is strictly on entities hiring for the designated target roles within the German, DACH, and remote European markets.
+
+
+Tier
+	Company
+	Germany/DACH relevance
+	Target role relevance
+	Careers page
+	ATS provider
+	ATS board URL
+	Public API URL
+	API status
+	Real job link field
+	Job ID field
+	Date fields
+	Recommended dedup key
+	Suggested filters
+	Confidence
+	Verification sources
+	Notes
+	Tier 1
+	Aleph Alpha
+	Remote Americas/HQ Germany
+	AI, Automation
+	getaleph.com/careers
+	Ashby
+	jobs.ashbyhq.com/aleph
+	api.ashbyhq.com/posting-api/job-board/aleph
+	verified public
+	jobUrl
+	id
+	updatedAt
+	ashby:aleph:{id}
+	AI, Automation, Prod
+	High
+	22
+	Highly remote global team, core to European AI ecosystem.
+	Tier 1
+	DeepL
+	Berlin, Remote Germany
+	AI, Product, Solutions
+	deepl.com
+	Ashby
+	jobs.ashbyhq.com/DeepL
+	api.ashbyhq.com/posting-api/job-board/DeepL
+	verified public
+	jobUrl
+	id
+	updatedAt
+	ashby:DeepL:{id}
+	AI, GTM, Solutions
+	High
+	24
+	Massive AI expansion phase. High volume of technical roles.
+	Tier 1
+	Black Forest Labs
+	Freiburg, Remote
+	AI, Data, Systems
+	bfl.ai/careers
+	Greenhouse
+	job-boards.greenhouse.io/blackforestlabs
+	boards-api.greenhouse.io/v1/boards/blackforestlabs/jobs?content=true
+	verified public
+	absolute_url
+	id
+	updated_at
+	greenhouse:blackforestlabs:{id}
+	ML, Data, Systems
+	High
+	39
+	Core German AI image model developer.
+	Tier 1
+	Parloa
+	Berlin, Munich, Remote Germany
+	AI, Forward Deployed
+	parloa.com/careers
+	Greenhouse EU
+	job-boards.eu.greenhouse.io/parloa
+	boards-api.eu.greenhouse.io/v1/boards/parloa/jobs?content=true
+	verified public
+	absolute_url
+	id
+	updated_at
+	greenhouse:parloa:{id}
+	FDE, AI, Solutions
+	High
+	6
+	Extremely high volume of FDE roles. Must use EU domain.
+	Tier 1
+	Langfuse
+	Berlin, Munich, Remote
+	AI, DevTools, GTM
+	langfuse.com/careers
+	Ashby
+	jobs.ashbyhq.com/langfuse
+	api.ashbyhq.com/posting-api/job-board/langfuse
+	verified public
+	jobUrl
+	id
+	updatedAt
+	ashby:langfuse:{id}
+	FDE, DevRel, Prod
+	High
+	9
+	Open-source LLMOps leader. High remote flexibility.
+	Tier 1
+	Lakera
+	Remote EU/DACH
+	AI, Security, Product
+	lakera.ai/careers
+	Ashby
+	jobs.ashbyhq.com/lakera.AI
+	api.ashbyhq.com/posting-api/job-board/lakera.AI
+	verified public
+	jobUrl
+	id
+	updatedAt
+	ashby:lakera.AI:{id}
+	AI, Product, Systems
+	High
+	43
+	Board slug specifically contains .AI extension.
+	Tier 1
+	n8n
+	Remote Germany
+	Automation, Product
+	n8n.io/careers
+	Ashby
+	jobs.ashbyhq.com/n8n
+	api.ashbyhq.com/posting-api/job-board/n8n
+	verified public
+	jobUrl
+	id
+	updatedAt
+	ashby:n8n:{id}
+	Automation, Prod, Solutions
+	High
+	23
+	Highly relevant for automation and internal tools.
+	Tier 1
+	Contentful
+	Berlin, Remote
+	DevTools, Product
+	contentful.com/careers
+	Greenhouse
+	job-boards.greenhouse.io/contentful
+	boards-api.greenhouse.io/v1/boards/contentful/jobs?content=true
+	verified public
+	absolute_url
+	id
+	updated_at
+	greenhouse:contentful:{id}
+	Prod, Solutions, Arch
+	High
+	46
+	Enterprise SaaS profiles. Heavy Solutions Architect hiring.
+	Tier 1
+	N26
+	Berlin
+	Fintech, Product, Systems
+	n26.com/en-eu/careers
+	Greenhouse
+	boards.greenhouse.io/n26
+	boards-api.greenhouse.io/v1/boards/n26/jobs?content=true
+	verified public
+	absolute_url
+	id
+	updated_at
+	greenhouse:n26:{id}
+	Systems, Product
+	High
+	48
+	Massive hiring hub for Berlin engineering.
+	Tier 1
+	Trade Republic
+	Berlin
+	Fintech, Systems
+	traderepublic.com/careers
+	Greenhouse
+	job-boards.greenhouse.io/traderepublic
+	boards-api.greenhouse.io/v1/boards/traderepublic/jobs?content=true
+	verified public
+	absolute_url
+	id
+	updated_at
+	greenhouse:traderepublic:{id}
+	Systems, Automation
+	High
+	51
+	Check payload for remote flexibility flags.
+	Tier 1
+	Taxfix
+	Berlin, Remote
+	Fintech, Product, Data
+	taxfix.de/en/careers
+	Ashby
+	jobs.ashbyhq.com/taxfix.com
+	api.ashbyhq.com/posting-api/job-board/taxfix.com
+	verified public
+	jobUrl
+	id
+	updatedAt
+	ashby:taxfix.com:{id}
+	Prod, Data, Systems
+	High
+	52
+	Slug utilizes .com suffix.
+	Tier 1
+	GetYourGuide
+	Berlin
+	B2C, Platform, RevOps
+	getyourguide.careers
+	Greenhouse
+	job-boards.greenhouse.io/getyourguide
+	boards-api.greenhouse.io/v1/boards/getyourguide/jobs?content=true
+	verified public
+	absolute_url
+	id
+	updated_at
+	greenhouse:getyourguide:{id}
+	Data, Eng, RevOps
+	High
+	54
+	Heavy operations and platform optimization roles.
+	Tier 1
+	HelloFresh
+	Berlin, Global
+	B2C, Systems, RevOps
+	careers.hellofresh.com
+	Greenhouse
+	job-boards.greenhouse.io/hellofresh
+	boards-api.greenhouse.io/v1/boards/hellofresh/jobs?content=true
+	verified public
+	absolute_url
+	id
+	updated_at
+	greenhouse:hellofresh:{id}
+	Systems, RevOps
+	High
+	57
+	Operates massive logistics scale. Ignore warehouse roles via filters.
+	Tier 1
+	Scout24
+	Munich, Berlin
+	Platform, Data, ML
+	scout24.com/en/career
+	Greenhouse
+	job-boards.greenhouse.io/autoscout24
+	boards-api.greenhouse.io/v1/boards/autoscout24/jobs?content=true
+	verified public
+	absolute_url
+	id
+	updated_at
+	greenhouse:autoscout24:{id}
+	ML, Data, Prod
+	High
+	11
+	Note autoscout24 slug identity.
+	Tier 1
+	OpenAI
+	Remote EMEA
+	AI, Solutions, FDE
+	openai.com/careers
+	Ashby
+	jobs.ashbyhq.com/openai
+	api.ashbyhq.com/posting-api/job-board/openai
+	verified public
+	jobUrl
+	id
+	updatedAt
+	ashby:openai:{id}
+	AI, GTM, FDE
+	High
+	8
+	Filter strongly for EMEA/Europe location parameters.
+	Tier 1
+	Anthropic
+	London, Munich, Remote
+	AI, Data
+	anthropic.com/careers
+	Greenhouse
+	job-boards.greenhouse.io/anthropic
+	boards-api.greenhouse.io/v1/boards/anthropic/jobs?content=true
+	verified public
+	absolute_url
+	id
+	updated_at
+	greenhouse:anthropic:{id}
+	AI, Eng, Prod
+	High
+	14
+	Frequent EU location nesting requires regex parsing.
+	Tier 1
+	Cohere
+	Remote Europe
+	AI, FDE, Solutions
+	cohere.com/careers
+	Ashby
+	jobs.ashbyhq.com/cohere
+	api.ashbyhq.com/posting-api/job-board/cohere
+	verified public
+	jobUrl
+	id
+	updatedAt
+	ashby:cohere:{id}
+	AI, Solutions, FDE
+	High
+	16
+	High volume of remote ML and enterprise solutions roles.
+	Tier 1
+	Vercel
+	Remote Germany
+	DevTools, Solutions
+	vercel.com/careers
+	Greenhouse
+	job-boards.greenhouse.io/vercel
+	boards-api.greenhouse.io/v1/boards/vercel/jobs?content=true
+	verified public
+	absolute_url
+	id
+	updated_at
+	greenhouse:vercel:{id}
+	Solutions, GTM, FDE
+	High
+	63
+	Location string often "Remote - United Kingdom, Germany".
+	Tier 1
+	Pinecone
+	Remote EMEA
+	AI, Data, DevTools
+	pinecone.io/careers
+	Ashby
+	jobs.ashbyhq.com/pinecone
+	api.ashbyhq.com/posting-api/job-board/pinecone
+	verified public
+	jobUrl
+	id
+	updatedAt
+	ashby:pinecone:{id}
+	Eng, Data, Prod
+	High
+	65
+	Verify EMEA listings locally via location object.
+	Tier 1
+	ElevenLabs
+	Remote EU
+	AI, Audio Models
+	elevenlabs.io/careers
+	Ashby
+	jobs.ashbyhq.com/elevenlabs
+	api.ashbyhq.com/posting-api/job-board/elevenlabs
+	verified public
+	jobUrl
+	id
+	updatedAt
+	ashby:elevenlabs:{id}
+	AI, Eng, Prod
+	High
+	67
+	Filter explicitly for Europe string matches.
+	Tier 1
+	Perplexity
+	Remote EU/Global
+	AI, Search
+	perplexity.ai/hub/careers
+	Ashby
+	jobs.ashbyhq.com/perplexity
+	api.ashbyhq.com/posting-api/job-board/perplexity
+	verified public
+	jobUrl
+	id
+	updatedAt
+	ashby:perplexity:{id}
+	AI, Prod, Eng
+	High
+	69
+	Filter for EU timezone alignment in descriptions.
+	Tier 1
+	Miro
+	Berlin, Remote
+	Platform, Product
+	miro.com/careers
+	Greenhouse
+	job-boards.greenhouse.io/realtimeboardglobal
+	boards-api.greenhouse.io/v1/boards/realtimeboardglobal/jobs?content=true
+	verified public
+	absolute_url
+	id
+	updated_at
+	greenhouse:realtimeboardglobal:{id}
+	Prod, Systems, RevOps
+	High
+	71
+	Notice the legacy board token realtimeboardglobal.
+	Tier 1
+	Upvest
+	Berlin
+	Fintech, API
+	upvest.co
+	Ashby
+	jobs.ashbyhq.com/upvest
+	api.ashbyhq.com/posting-api/job-board/upvest
+	verified public
+	jobUrl
+	id
+	updatedAt
+	ashby:upvest:{id}
+	API, Solutions, Data
+	High
+	73
+	Key DACH B2B SaaS embedded finance player.
+	Tier 1
+	Clarisights
+	Remote
+	Data, Analytics
+	clarisights.com
+	Ashby
+	jobs.ashbyhq.com/clarisights
+	api.ashbyhq.com/posting-api/job-board/clarisights
+	verified public
+	jobUrl
+	id
+	updatedAt
+	ashby:clarisights:{id}
+	FDE, GTM, Solutions
+	High
+	12
+	Specialized analytics integrations for enterprise clients.
+	Tier 1
+	Lovehoney Group
+	Remote Germany
+	E-commerce Tech
+	lovehoneygroup.com
+	Lever EU
+	jobs.eu.lever.co/lovehoneygroup
+	api.eu.lever.co/v0/postings/lovehoneygroup?mode=json
+	verified public
+	hostedUrl
+	id
+	createdAt
+	lever:lovehoneygroup:{id}
+	Prod, Data, Systems
+	High
+	7
+	Lever EU endpoint required for successful parsing.
+	Tier 1
+	Weights & Biases
+	Remote DACH/EU
+	AI, MLOps
+	wandb.ai/site/careers
+	Greenhouse
+	job-boards.greenhouse.io/wandb
+	boards-api.greenhouse.io/v1/boards/wandb/jobs?content=true
+	inferred public
+	absolute_url
+	id
+	updated_at
+	greenhouse:wandb:{id}
+	AI, Solutions, FDE
+	Medium
+	75
+	Central to LLMOps and ML systems engineering ecosystems.
+	Tier 1
+	Datapao
+	Remote DACH
+	Data Consulting
+	datapao.com/careers
+	Greenhouse EU
+	job-boards.eu.greenhouse.io/datapao
+	boards-api.eu.greenhouse.io/v1/boards/datapao/jobs?content=true
+	verified public
+	absolute_url
+	id
+	updated_at
+	greenhouse:datapao:{id}
+	Data, Eng, Consulting
+	High
+	77
+	Niche data firm utilizing datapao on Greenhouse EU.
+	Table 2: ATS Provider Patterns and Derivation Mechanics
+The programmatic identification and extraction of job data require a deep understanding of ATS URL patterns and RESTful routing logic. The following table delineates the precise technical mechanisms required to parse and process data from the broader ATS ecosystem, encompassing both Tier 1 platforms and the Tier 2/3 providers that dictate the remainder of the German tech market.
+
+
+ATS provider
+	How to recognize
+	API pattern
+	Auth required?
+	Primary job URL field
+	Job ID field
+	Date fields
+	German/EU caveats
+	Reliability notes
+	Greenhouse
+	job-boards.greenhouse.io/{board} or boards.greenhouse.io/{board}
+	boards-api.greenhouse.io/v1/boards/{board}/jobs?content=true
+	No
+	absolute_url
+	id
+	updated_at
+	None
+	Highly stable. Arrays returned flat. No native pagination.18
+	Greenhouse EU
+	job-boards.eu.greenhouse.io/{board}
+	boards-api.eu.greenhouse.io/v1/boards/{board}/jobs?content=true
+	No
+	absolute_url
+	id
+	updated_at
+	Mandatory for many GDPR-compliant DACH firms (e.g., Parloa).6
+	Identical to global schema, distinct routing required to avoid 404s.
+	Ashby
+	jobs.ashbyhq.com/{board}
+	api.ashbyhq.com/posting-api/job-board/{board}?includeCompensation=true
+	No
+	jobUrl
+	id
+	updatedAt, publishedAt
+	Nested location structures must be regex-matched for DACH cities.21
+	Extremely reliable JSON. Rich compensation metadata exposed.
+	Lever
+	jobs.lever.co/{site}
+	api.lever.co/v0/postings/{site}?mode=json
+	No
+	hostedUrl
+	id
+	createdAt
+	Location often concatenated; heavy string parsing required.8
+	hostedUrl preferred over applyUrl for display purposes.
+	Lever EU
+	jobs.eu.lever.co/{site}
+	api.eu.lever.co/v0/postings/{site}?mode=json
+	No
+	hostedUrl
+	id
+	createdAt
+	Mandatory for GDPR-compliant entities (e.g., Lovehoney Group).7
+	High reliability; identical schema to standard Lever instance.
+	Personio
+	{company}.jobs.personio.de
+	https://{company}.jobs.personio.de/search.json
+	No
+	url (or derived HTML)
+	id
+	Not consistently exposed
+	Deeply embedded in the German HR market.25
+	Returns full HTML descriptions within the JSON payload.
+	Recruitee
+	{company}.recruitee.com
+	https://{company}.recruitee.com/api/offers
+	No
+	careers_url
+	id
+	created_at
+	Highly popular amongst mid-market EU tech.27
+	Returns all jobs without pagination needed.
+	SmartRecruiters
+	careers.smartrecruiters.com/{company}
+	api.smartrecruiters.com/v1/companies/{company}/postings
+	No
+	jobAdUrl
+	id
+	postedDate
+	Extensive enterprise penetration.29
+	companyIdentifier acts as the primary API slug.
+	Workable
+	apply.workable.com/{company}
+	apply.workable.com/api/v1/widget/accounts/{company}
+	No
+	url
+	id
+	published_on
+	Official v3 API requires Token, but widget API is open.4
+	Widget API is reliable but undocumented officially.
+	Teamtailor
+	careers.{company}.com (powered by)
+	api.teamtailor.com/v1/jobs
+	Yes (Token)
+	N/A
+	id
+	created-at
+	Prevalent in Nordic/DACH startups.3
+	Public JSON is blocked without an API key; XML required.
+	Workday
+	myworkdayjobs.com
+	Varies entirely by deployment
+	Yes / Blocked
+	N/A
+	N/A
+	N/A
+	Default for legacy DACH enterprises (Zalando, Delivery Hero).5
+	Extremely hostile to programmatic scraping. High maintenance.
+	Softgarden
+	{company}.softgarden.io
+	Custom/Widget based
+	Unknown
+	HTML
+	HTML
+	HTML
+	High DACH market share for Mittelstand companies.
+	Generally requires HTML scraping.
+	Join.com
+	join.com/companies/{company}
+	Sub-resource parsing
+	Unknown
+	URL
+	ID
+	Date
+	Emerging free ATS for DACH startups.
+	Requires browser automation for extraction.
+	BambooHR
+	{company}.bamboohr.com/careers
+	api.bamboohr.com/api/gateway.php/{company}/v1/applicant/tracking/jobboards
+	Yes
+	N/A
+	id
+	N/A
+	Occasionally used alongside Personio.78
+	XML feed is usually available, JSON is restricted.
+	Custom Pages
+	Proprietary DOM
+	None
+	N/A
+	Custom
+	Custom
+	Custom
+	Very common in secretive AI labs (e.g., Mistral).79
+	Playwright/Selenium DOM parsing mandatory.
+	Strategic Expansion: Table 3 German-Market Seed List (Discovery Backlog)
+While the Tier 1 registry provides immediate operational capability for an API-driven job discovery tool, a truly comprehensive mapping of the DACH talent ecosystem cannot ignore organizations utilizing closed or proprietary systems. Companies operating in the high-growth AI and enterprise SaaS domains frequently customize their application flows, resulting in obscured ATS providers.
+The following "Seed List" identifies critical DACH-relevant organizations that represent exceptionally high value for the target roles (AI, FDE, Solutions, Automation) but require secondary discovery phases, API key partnerships, or DOM-based web scraping to integrate successfully. For instance, Delivery Hero and Zalando, cornerstones of the Berlin technology scene, deploy highly complex Workday environments that actively resist unauthenticated JSON polling.5 Similarly, Celonis, a flagship Munich-based enterprise, utilizes proprietary portal routing that obscures direct API access.80
+
+
+Company
+	Category
+	Germany/DACH reason
+	Careers page
+	Detected ATS/provider
+	API readiness
+	Priority
+	Why include/exclude
+	Helsing
+	AI / Defense
+	Offices in Berlin, Munich
+	helsing.ai/careers
+	Custom / Unknown
+	Needs browser discovery
+	High
+	Premier European deep tech/AI lab. Massive engineering hiring volume.81
+	Celonis
+	B2B SaaS / Process Mining
+	HQ in Munich
+	careers.celonis.com
+	Workday / Custom
+	Needs browser discovery
+	High
+	Flagship DACH unicorn. Heavy recruiter of AI, FDE, and Solutions Architects.80
+	Cognigy
+	AI / Automation
+	HQ in Düsseldorf
+	careers.cognigy.com
+	Custom / Softgarden
+	Needs browser discovery
+	Medium
+	Critical enterprise AI automation player in Germany.82
+	Pitch
+	B2B SaaS / DevTools
+	HQ in Berlin
+	pitch.com/jobs
+	Custom / Unknown
+	Needs browser discovery
+	Medium
+	Strong product-led growth design and engineering hub.84
+	Delivery Hero
+	Consumer Tech
+	HQ in Berlin
+	careers.deliveryhero.com
+	Workday
+	Blocked / Scraping needed
+	Medium
+	Vast logistics systems and data science infrastructure. Difficult to parse.5
+	Zalando
+	E-commerce Tech
+	HQ in Berlin
+	jobs.zalando.com
+	Workday
+	Blocked / Scraping needed
+	High
+	Largest tech employer in Berlin. Huge ML, internal tools, and automation teams.5
+	Mistral AI
+	AI Foundation Models
+	Hiring in Europe
+	mistral.ai/careers
+	Custom
+	Needs browser discovery
+	High
+	European AI champion; highly secretive hiring portals.79
+	Supabase
+	DevTools
+	Remote Europe
+	supabase.com/careers
+	Custom / Greenhouse API hidden
+	Inferred
+	Medium
+	Key remote employer for DevTools, GTM Engineering, RevOps.85
+	Dept
+	Digital Agency
+	DACH Region
+	deptagency.com/careers
+	Greenhouse
+	Verified
+	Low
+	Agency model, but hires automation and data specialists; token dept.86
+	Implementation Strategy and Configuration Schema
+To operationalize the findings of this research report, the target job discovery tool requires a highly structured configuration architecture. The core scanning engine must mathematically decouple the data extraction logic (the HTTP GET request to the ATS) from the semantic filtering logic (the evaluation of the role's relevance).
+The scanner should chronologically iterate through the configured array of companies, dynamically substitute the ats_slug into the established provider URL template (accounting for EU domain variations), fetch the JSON payload, and execute an evaluation across the properties. Title filtering is paramount; due to severe semantic variability in job naming conventions, the tool must execute positive regular expressions against target strings (AI, Forward Deployed, GTM Engineer) while rigorously applying negative filters to exclude non-target hierarchies (Intern, Werkstudent, SAP ABAP). Location filtering must similarly account for geographic edge cases, accepting explicit exact matches (Berlin, München) alongside regional umbrella terms (EMEA, Remote EU, DACH).9
+The following YAML output provides a production-ready configuration draft, mapping the technical findings of this report directly into a declarative syntax suitable for ingestion engines such as the referenced CareerOps architecture.
+
+
+YAML
+
+
+
+
+market: germany
+generated_at: 2026-04-19
+freshness:
+ max_age_days: 60
+
+title_filter:
+ positive:
+   - AI
+   - ML
+   - LLM
+   - GenAI
+   - Agent
+   - Agentic
+   - Automation
+   - Product Manager
+   - Technical Product Manager
+   - Solutions Architect
+   - Solutions Engineer
+   - Forward Deployed
+   - Customer Engineer
+   - GTM Engineer
+   - RevOps
+   - Business Systems
+   - Internal Tools
+ negative:
+   - Intern
+   - Working Student
+   - Werkstudent
+   - Praktikum
+   - Junior
+   - SAP ABAP
+   - Mainframe
+   - Embedded
+   - iOS
+   - Android
+   - PHP
+
+location_filter:
+ include:
+   - Germany
+   - Deutschland
+   - Berlin
+   - Munich
+   - München
+   - Hamburg
+   - Cologne
+   - Köln
+   - Frankfurt
+   - Stuttgart
+   - Remote
+   - Remote Germany
+   - Remote EU
+   - EMEA
+   - Europe
+ exclude:
+   - United States only
+   - US only
+
+tracked_companies:
+ - name: Aleph Alpha
+   market: Germany
+   careers_url: https://getaleph.com/careers
+   ats_provider: ashby
+   ats_region: global
+   ats_slug: aleph
+   api_url: https://api.ashbyhq.com/posting-api/job-board/aleph?includeCompensation=true
+   job_url_field: jobUrl
+   job_id_field: id
+   date_fields:
+     - updatedAt
+   dedup_key: ashby:aleph:{id}
+   enabled: true
+   confidence: high
+   notes: Heavily hires remote global/Americas but is a core German AI firm.
+
+ - name: DeepL
+   market: Germany
+   careers_url: https://deepl.com
+   ats_provider: ashby
+   ats_region: global
+   ats_slug: DeepL
+   api_url: https://api.ashbyhq.com/posting-api/job-board/DeepL?includeCompensation=true
+   job_url_field: jobUrl
+   job_id_field: id
+   date_fields:
+     - updatedAt
+   dedup_key: ashby:DeepL:{id}
+   enabled: true
+   confidence: high
+   notes: Major Berlin AI hub.
+
+ - name: Black Forest Labs
+   market: Germany
+   careers_url: https://bfl.ai/careers
+   ats_provider: greenhouse
+   ats_region: global
+   ats_slug: blackforestlabs
+   api_url: https://boards-api.greenhouse.io/v1/boards/blackforestlabs/jobs?content=true
+   job_url_field: absolute_url
+   job_id_field: id
+   date_fields:
+     - updated_at
+   dedup_key: greenhouse:blackforestlabs:{id}
+   enabled: true
+   confidence: high
+   notes: Freiburg-based core AI model developer.
+
+ - name: Parloa
+   market: Germany
+   careers_url: https://parloa.com/careers
+   ats_provider: greenhouse
+   ats_region: eu
+   ats_slug: parloa
+   api_url: https://boards-api.eu.greenhouse.io/v1/boards/parloa/jobs?content=true
+   job_url_field: absolute_url
+   job_id_field: id
+   date_fields:
+     - updated_at
+   dedup_key: greenhouse:parloa:{id}
+   enabled: true
+   confidence: high
+   notes: Requires Greenhouse EU endpoint. High volume of FDE roles.
+
+ - name: Langfuse
+   market: Germany
+   careers_url: https://langfuse.com/careers
+   ats_provider: ashby
+   ats_region: global
+   ats_slug: langfuse
+   api_url: https://api.ashbyhq.com/posting-api/job-board/langfuse?includeCompensation=true
+   job_url_field: jobUrl
+   job_id_field: id
+   date_fields:
+     - updatedAt
+   dedup_key: ashby:langfuse:{id}
+   enabled: true
+   confidence: high
+   notes: Berlin/Munich DevTools leader.
+
+ - name: n8n
+   market: Germany
+   careers_url: https://n8n.io/careers
+   ats_provider: ashby
+   ats_region: global
+   ats_slug: n8n
+   api_url: https://api.ashbyhq.com/posting-api/job-board/n8n?includeCompensation=true
+   job_url_field: jobUrl
+   job_id_field: id
+   date_fields:
+     - updatedAt
+   dedup_key: ashby:n8n:{id}
+   enabled: true
+   confidence: high
+   notes: Essential for automation and workflow roles.
+
+ - name: Contentful
+   market: Germany
+   careers_url: https://contentful.com/careers
+   ats_provider: greenhouse
+   ats_region: global
+   ats_slug: contentful
+   api_url: https://boards-api.greenhouse.io/v1/boards/contentful/jobs?content=true
+   job_url_field: absolute_url
+   job_id_field: id
+   date_fields:
+     - updated_at
+   dedup_key: greenhouse:contentful:{id}
+   enabled: true
+   confidence: high
+   notes: Berlin HQ enterprise SaaS.
+
+ - name: N26
+   market: Germany
+   careers_url: https://n26.com/en-eu/careers
+   ats_provider: greenhouse
+   ats_region: global
+   ats_slug: n26
+   api_url: https://boards-api.greenhouse.io/v1/boards/n26/jobs?content=true
+   job_url_field: absolute_url
+   job_id_field: id
+   date_fields:
+     - updated_at
+   dedup_key: greenhouse:n26:{id}
+   enabled: true
+   confidence: high
+   notes: Flagship German Fintech.
+
+ - name: Trade Republic
+   market: Germany
+   careers_url: https://traderepublic.com/careers
+   ats_provider: greenhouse
+   ats_region: global
+   ats_slug: traderepublic
+   api_url: https://boards-api.greenhouse.io/v1/boards/traderepublic/jobs?content=true
+   job_url_field: absolute_url
+   job_id_field: id
+   date_fields:
+     - updated_at
+   dedup_key: greenhouse:traderepublic:{id}
+   enabled: true
+   confidence: high
+   notes: Core Fintech platform engineering.
+
+ - name: Taxfix
+   market: Germany
+   careers_url: https://taxfix.de/en/careers
+   ats_provider: ashby
+   ats_region: global
+   ats_slug: taxfix.com
+   api_url: https://api.ashbyhq.com/posting-api/job-board/taxfix.com?includeCompensation=true
+   job_url_field: jobUrl
+   job_id_field: id
+   date_fields:
+     - updatedAt
+   dedup_key: ashby:taxfix.com:{id}
+   enabled: true
+   confidence: high
+   notes: Note the slug utilizes the.com extension.
+
+ - name: GetYourGuide
+   market: Germany
+   careers_url: https://getyourguide.careers
+   ats_provider: greenhouse
+   ats_region: global
+   ats_slug: getyourguide
+   api_url: https://boards-api.greenhouse.io/v1/boards/getyourguide/jobs?content=true
+   job_url_field: absolute_url
+   job_id_field: id
+   date_fields:
+     - updated_at
+   dedup_key: greenhouse:getyourguide:{id}
+   enabled: true
+   confidence: high
+   notes: High volume data and systems engineering.
+
+ - name: HelloFresh
+   market: Germany
+   careers_url: https://careers.hellofresh.com
+   ats_provider: greenhouse
+   ats_region: global
+   ats_slug: hellofresh
+   api_url: https://boards-api.greenhouse.io/v1/boards/hellofresh/jobs?content=true
+   job_url_field: absolute_url
+   job_id_field: id
+   date_fields:
+     - updated_at
+   dedup_key: greenhouse:hellofresh:{id}
+   enabled: true
+   confidence: high
+   notes: Broad global footprint; strict filtering required.
+
+ - name: Scout24
+   market: Germany
+   careers_url: https://scout24.com/en/career
+   ats_provider: greenhouse
+   ats_region: global
+   ats_slug: autoscout24
+   api_url: https://boards-api.greenhouse.io/v1/boards/autoscout24/jobs?content=true
+   job_url_field: absolute_url
+   job_id_field: id
+   date_fields:
+     - updated_at
+   dedup_key: greenhouse:autoscout24:{id}
+   enabled: true
+   confidence: high
+   notes: Note the legacy autoscout24 token.
+
+ - name: OpenAI
+   market: EMEA
+   careers_url: https://openai.com/careers
+   ats_provider: ashby
+   ats_region: global
+   ats_slug: openai
+   api_url: https://api.ashbyhq.com/posting-api/job-board/openai?includeCompensation=true
+   job_url_field: jobUrl
+   job_id_field: id
+   date_fields:
+     - updatedAt
+   dedup_key: ashby:openai:{id}
+   enabled: true
+   confidence: high
+   notes: Strict filtering for EMEA and London/Remote required.
+
+ - name: Anthropic
+   market: EMEA
+   careers_url: https://anthropic.com/careers
+   ats_provider: greenhouse
+   ats_region: global
+   ats_slug: anthropic
+   api_url: https://boards-api.greenhouse.io/v1/boards/anthropic/jobs?content=true
+   job_url_field: absolute_url
+   job_id_field: id
+   date_fields:
+     - updated_at
+   dedup_key: greenhouse:anthropic:{id}
+   enabled: true
+   confidence: high
+   notes: Munich and London hubs.
+
+ - name: Cohere
+   market: EMEA
+   careers_url: https://cohere.com/careers
+   ats_provider: ashby
+   ats_region: global
+   ats_slug: cohere
+   api_url: https://api.ashbyhq.com/posting-api/job-board/cohere?includeCompensation=true
+   job_url_field: jobUrl
+   job_id_field: id
+   date_fields:
+     - updatedAt
+   dedup_key: ashby:cohere:{id}
+   enabled: true
+   confidence: high
+   notes: High remote availability.
+
+ - name: Vercel
+   market: Germany
+   careers_url: https://vercel.com/careers
+   ats_provider: greenhouse
+   ats_region: global
+   ats_slug: vercel
+   api_url: https://boards-api.greenhouse.io/v1/boards/vercel/jobs?content=true
+   job_url_field: absolute_url
+   job_id_field: id
+   date_fields:
+     - updated_at
+   dedup_key: greenhouse:vercel:{id}
+   enabled: true
+   confidence: high
+   notes: Location strings often concatenated with UK.
+
+ - name: Pinecone
+   market: EMEA
+   careers_url: https://pinecone.io/careers
+   ats_provider: ashby
+   ats_region: global
+   ats_slug: pinecone
+   api_url: https://api.ashbyhq.com/posting-api/job-board/pinecone?includeCompensation=true
+   job_url_field: jobUrl
+   job_id_field: id
+   date_fields:
+     - updatedAt
+   dedup_key: ashby:pinecone:{id}
+   enabled: true
+   confidence: high
+   notes: Verify EMEA listings locally via location object.
+
+ - name: ElevenLabs
+   market: EMEA
+   careers_url: https://elevenlabs.io/careers
+   ats_provider: ashby
+   ats_region: global
+   ats_slug: elevenlabs
+   api_url: https://api.ashbyhq.com/posting-api/job-board/elevenlabs?includeCompensation=true
+   job_url_field: jobUrl
+   job_id_field: id
+   date_fields:
+     - updatedAt
+   dedup_key: ashby:elevenlabs:{id}
+   enabled: true
+   confidence: high
+   notes: Filter explicitly for Europe string matches.
+
+ - name: Perplexity
+   market: EMEA
+   careers_url: https://perplexity.ai/hub/careers
+   ats_provider: ashby
+   ats_region: global
+   ats_slug: perplexity
+   api_url: https://api.ashbyhq.com/posting-api/job-board/perplexity?includeCompensation=true
+   job_url_field: jobUrl
+   job_id_field: id
+   date_fields:
+     - updatedAt
+   dedup_key: ashby:perplexity:{id}
+   enabled: true
+   confidence: high
+   notes: Filter for EU timezone alignment in descriptions.
+
+ - name: Miro
+   market: Germany
+   careers_url: https://miro.com/careers
+   ats_provider: greenhouse
+   ats_region: global
+   ats_slug: realtimeboardglobal
+   api_url: https://boards-api.greenhouse.io/v1/boards/realtimeboardglobal/jobs?content=true
+   job_url_field: absolute_url
+   job_id_field: id
+   date_fields:
+     - updated_at
+   dedup_key: greenhouse:realtimeboardglobal:{id}
+   enabled: true
+   confidence: high
+   notes: Notice the legacy board token realtimeboardglobal.
+
+ - name: Upvest
+   market: Germany
+   careers_url: https://upvest.co
+   ats_provider: ashby
+   ats_region: global
+   ats_slug: upvest
+   api_url: https://api.ashbyhq.com/posting-api/job-board/upvest?includeCompensation=true
+   job_url_field: jobUrl
+   job_id_field: id
+   date_fields:
+     - updatedAt
+   dedup_key: ashby:upvest:{id}
+   enabled: true
+   confidence: high
+   notes: Key DACH B2B SaaS embedded finance player.
+
+ - name: Clarisights
+   market: Germany
+   careers_url: https://clarisights.com
+   ats_provider: ashby
+   ats_region: global
+   ats_slug: clarisights
+   api_url: https://api.ashbyhq.com/posting-api/job-board/clarisights?includeCompensation=true
+   job_url_field: jobUrl
+   job_id_field: id
+   date_fields:
+     - updatedAt
+   dedup_key: ashby:clarisights:{id}
+   enabled: true
+   confidence: high
+   notes: Specialized analytics integrations for enterprise clients.
+
+ - name: Lovehoney Group
+   market: Germany
+   careers_url: https://lovehoneygroup.com
+   ats_provider: lever
+   ats_region: eu
+   ats_slug: lovehoneygroup
+   api_url: https://api.eu.lever.co/v0/postings/lovehoneygroup?mode=json
+   job_url_field: hostedUrl
+   job_id_field: id
+   date_fields:
+     - createdAt
+   dedup_key: lever:lovehoneygroup:{id}
+   enabled: true
+   confidence: high
+   notes: Lever EU API deployment verified.
+
+ - name: Weights & Biases
+   market: EMEA
+   careers_url: https://wandb.ai/site/careers
+   ats_provider: greenhouse
+   ats_region: global
+   ats_slug: wandb
+   api_url: https://boards-api.greenhouse.io/v1/boards/wandb/jobs?content=true
+   job_url_field: absolute_url
+   job_id_field: id
+   date_fields:
+     - updated_at
+   dedup_key: greenhouse:wandb:{id}
+   enabled: true
+   confidence: medium
+   notes: Central to LLMOps and ML systems engineering ecosystems.
+
+ - name: Datapao
+   market: Germany
+   careers_url: https://datapao.com/careers
+   ats_provider: greenhouse
+   ats_region: eu
+   ats_slug: datapao
+   api_url: https://boards-api.eu.greenhouse.io/v1/boards/datapao/jobs?content=true
+   job_url_field: absolute_url
+   job_id_field: id
+   date_fields:
+     - updated_at
+   dedup_key: greenhouse:datapao:{id}
+   enabled: true
+   confidence: high
+   notes: Niche data firm utilizing datapao on Greenhouse EU.
+
+discovery_backlog:
+ - name: Helsing
+   careers_url: https://helsing.ai/careers
+   detected_provider: custom
+   reason: Premier European AI defense contractor, highly relevant roles, API structure obscured.
+   priority: high
+
+ - name: Zalando
+   careers_url: https://jobs.zalando.com
+   detected_provider: workday
+   reason: Largest Berlin tech employer, blocks standard JSON payloads.
+   priority: high
+
+ - name: Celonis
+   careers_url: https://careers.celonis.com
+   detected_provider: workday
+   reason: Major DACH unicorn hiring specialized AI and Solutions roles.
+   priority: high
+
+ - name: Mistral AI
+   careers_url: https://mistral.ai/careers
+   detected_provider: custom
+   reason: European foundational model provider, relies on bespoke application workflows.
+   priority: high
+
+ - name: Supabase
+   careers_url: https://supabase.com/careers
+   detected_provider: custom
+   reason: Key remote employer for DevTools, API endpoint not standard.
+   priority: medium
+
+ - name: Delivery Hero
+   careers_url: https://careers.deliveryhero.com
+   detected_provider: workday
+   reason: Vast logistics systems and data science infrastructure.
+   priority: medium
+
+ - name: Pitch
+   careers_url: https://pitch.com/jobs
+   detected_provider: custom
+   reason: Strong product-led growth design and engineering hub.
+   priority: medium
+
+ - name: Cognigy
+   careers_url: https://careers.cognigy.com
+   detected_provider: softgarden
+   reason: Critical enterprise AI automation player in Germany.
+   priority: medium

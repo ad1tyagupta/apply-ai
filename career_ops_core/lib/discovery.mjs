@@ -3,8 +3,10 @@ function uniqueStrings(values = []) {
 }
 
 export function detectApi(company = {}) {
-  if (company.api && String(company.api).includes("greenhouse")) {
-    return { type: "greenhouse", url: company.api };
+  const explicitApiUrl = company.api_url || company.api;
+  if (explicitApiUrl) {
+    const provider = inferApiType(company.ats_provider || company.api_provider, explicitApiUrl);
+    if (provider) return { type: provider, url: explicitApiUrl };
   }
 
   const url = company.careers_url || "";
@@ -33,6 +35,18 @@ export function detectApi(company = {}) {
     };
   }
 
+  return null;
+}
+
+function inferApiType(provider = "", apiUrl = "") {
+  const normalizedProvider = String(provider).toLowerCase();
+  const normalizedUrl = String(apiUrl).toLowerCase();
+  if (normalizedProvider.includes("greenhouse")) return "greenhouse";
+  if (normalizedProvider.includes("ashby")) return "ashby";
+  if (normalizedProvider.includes("lever")) return "lever";
+  if (normalizedUrl.includes("greenhouse")) return "greenhouse";
+  if (normalizedUrl.includes("ashbyhq")) return "ashby";
+  if (normalizedUrl.includes("lever.co")) return "lever";
   return null;
 }
 
@@ -67,11 +81,10 @@ export function buildHybridDiscoveryPlan(companies = [], { locationTerms = [], r
     const api = detectApi(company);
     if (api) {
       trackedCompanies.push({
-        name: company.name,
-        careers_url: company.careers_url,
+        ...company,
         enabled: company.enabled !== false,
         role_fit: company.role_fit || [],
-        api: company.api,
+        api: company.api || company.api_url,
       });
       continue;
     }

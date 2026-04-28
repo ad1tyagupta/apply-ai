@@ -13,7 +13,7 @@ ApplyAI was inspired by [Career Ops](https://github.com/santifer/career-ops) and
 - recommends 20 to 30 companies and 10 to 20 role families
 - lets the user add their own target companies
 - keeps generated suggestions separate from user-confirmed preferences
-- builds `portals.yml` only from confirmed preferences
+- builds `portals.yml` from confirmed preferences, with an optional top-recommendations fallback when no companies are accepted yet
 - supports hybrid discovery through local scanning plus Codex-assisted search queries
 - scores jobs against the user’s selected search strategy
 - keeps final application submission manual
@@ -44,6 +44,8 @@ npm install
 npx playwright install chromium
 npm run doctor
 ```
+
+`npm run doctor` creates local runtime config files from the examples if they are missing. Those runtime files are ignored by Git so personal data does not leak into the public template repo.
 
 ## Recommended Workflow
 
@@ -107,6 +109,8 @@ Examples:
 ApplyAI also asks for seniority intent. This matters because users may intentionally target junior or mid-level roles in a new market even if they have more experience elsewhere, or they may want internships included or rejected.
 
 Selected companies are priority companies, not a hard limit. ApplyAI should still use market-wide discovery queries for all matching companies in the chosen geography.
+
+If no companies have been accepted yet, `npm run portals:build` can seed the scan plan from the top entries in `profile/recommendations.yml`. This is controlled by `companyPreferences.autoTrackRecommendedCompanies` and `companyPreferences.recommendationFallbackLimit`.
 
 ## Repository Layout
 

@@ -17,7 +17,19 @@
 
 # -- Title filter --
 # The scanner uses these keywords to decide if a title is relevant.
-# At least 1 positive must match AND 0 negatives must match (case-insensitive).
+# At least 1 positive must match AND 0 negatives must match.
+# Matching is token-aware, so "AI" does not match words such as "Spain".
+
+freshness:
+  # Listings with a known posting/update date older than this are skipped.
+  # Listings without a date are kept because some ATS APIs do not expose one.
+  max_age_days: 60
+
+link_validation:
+  # When enabled, the scanner drops final job URLs that return explicit 404/410.
+  # Transient network failures and protected 401/403 pages are kept.
+  enabled: true
+  reject_statuses: [404, 410]
 
 title_filter:
   positive:

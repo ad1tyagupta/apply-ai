@@ -5,6 +5,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import yaml from "js-yaml";
 
+import { loadMarketData } from "./lib/market-loader.mjs";
 import { recommendTargets } from "./lib/recommendations.mjs";
 
 const CORE_DIR = dirname(fileURLToPath(import.meta.url));
@@ -15,8 +16,9 @@ function loadYaml(path) {
 }
 
 const preferences = loadYaml(join(projectRoot, "config", "user-preferences.yml"));
-const roleFamilies = loadYaml(join(projectRoot, "market", "default", "role-families.yml")).role_families;
-const companies = loadYaml(join(projectRoot, "market", "default", "companies.yml")).companies;
+const market = loadMarketData(projectRoot, preferences);
+const roleFamilies = market.roleFamilies;
+const companies = market.companies;
 const factsPath = join(projectRoot, preferences.documents?.factsPath || "profile/facts.yml");
 const recommendationsPath = join(projectRoot, preferences.documents?.recommendationsPath || "profile/recommendations.yml");
 
@@ -74,4 +76,4 @@ const lines = [
 
 writeFileSync(join(projectRoot, "profile", "target-recommendations.md"), lines.join("\n"), "utf8");
 
-console.log(`Wrote ${recommendations.roles.length} role recommendations and ${recommendations.companies.length} company recommendations.`);
+console.log(`Wrote ${recommendations.roles.length} role recommendations and ${recommendations.companies.length} company recommendations for ${market.name}.`);

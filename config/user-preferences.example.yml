@@ -7,6 +7,10 @@ workspace:
   recommendedPrivateWorkspace: "../apply-ai-private"
   keepPersonalDataPrivate: true
 
+market:
+  # Use "germany" for the API-first DACH/Germany market pack.
+  active: "germany"
+
 geography:
   countries: []
   cities: []
@@ -43,6 +47,10 @@ companyPreferences:
   acceptedCompanies: []
   excludedCompanies: []
   customCompanies: []
+  # If no companies are accepted yet, portals:build can seed the scan plan
+  # from the top companies in profile/recommendations.yml.
+  autoTrackRecommendedCompanies: true
+  recommendationFallbackLimit: 10
 
 documents:
   rawDir: "intake/raw"

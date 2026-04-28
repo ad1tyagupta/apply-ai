@@ -22,9 +22,11 @@ intake/normalized/*
 !intake/normalized/README.md
 
 # Derived user profile working memory
+profile/*
+!profile/README.md
+!profile/wiki/
 profile/wiki/*
 !profile/wiki/README.md
-profile/target-recommendations.md
 
 # Personalized runtime files
 config/profile.yml
@@ -34,10 +36,8 @@ article-digest.md
 portals.yml
 
 # User tracking and application state
-data/applications.md
-data/follow-ups.md
-data/pipeline.md
-data/scan-history.tsv
+data/*
+!data/README.md
 
 # Generated outputs
 output/*

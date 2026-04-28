@@ -17,8 +17,13 @@
 import { chromium } from 'playwright';
 import { readFile } from 'fs/promises';
 import { classifyLiveness } from './liveness-core.mjs';
+import { isSafePublicHttpUrl } from './lib/url-safety.mjs';
 
 async function checkUrl(page, url) {
+  if (!isSafePublicHttpUrl(url, { allowLocal: process.env.APPLYAI_ALLOW_LOCAL_URLS === '1' })) {
+    return { result: 'expired', reason: 'unsupported or private URL' };
+  }
+
   try {
     const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 });
 

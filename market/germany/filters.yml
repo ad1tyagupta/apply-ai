@@ -1,0 +1,23 @@
+hard_stops:
+  - id: "germany-location-mismatch"
+    rule: "Reject roles that are clearly unavailable to Germany, DACH, EU, Europe, EMEA, or explicit remote-Europe candidates."
+  - id: "german-language-blocker"
+    rule: "Reject roles that require German above the user's confirmed max role requirement."
+  - id: "working-student-or-internship"
+    rule: "Reject Working Student, Werkstudent, Praktikum, Internship, and Junior roles unless explicitly requested."
+  - id: "non-target-stack"
+    rule: "Reject roles dominated by excluded stacks such as SAP ABAP, Mainframe, Embedded, iOS, Android, or PHP."
+
+scoring_defaults:
+  broad: 60
+  balanced: 60
+  highly_selective: 85
+
+scoring_dimensions:
+  - "role-fit"
+  - "evidence-fit"
+  - "location-fit"
+  - "language-fit"
+  - "seniority-realism"
+  - "ats-link-quality"
+  - "company-attractiveness"

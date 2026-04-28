@@ -1,0 +1,223 @@
+market: germany
+generated_at: "2026-04-19"
+status: normalized
+
+source_files:
+  - "../raw/chatgpt-deep-research-report.md"
+  - "../raw/german-job-discovery-tool-registry.txt"
+
+runtime_config:
+  companies: "../../../market/germany/companies.yml"
+  queries: "../../../market/germany/queries.yml"
+  role_families: "../../../market/germany/role-families.yml"
+  filters: "../../../market/germany/filters.yml"
+
+normalization:
+  raw_files_readable: true
+  raw_files_are_primary_source: false
+  duplicate_policy: "Use the runtime Germany market pack as canonical; keep one row per company and one row per backlog item."
+  api_ready_company_count: 34
+  backlog_company_count: 10
+  supported_v1_providers:
+    - greenhouse
+    - ashby
+    - lever
+  default_freshness:
+    max_age_days: 60
+  validation:
+    last_endpoint_check: "2026-04-19"
+    api_endpoints_checked: 34
+    api_endpoints_ok: 34
+    api_endpoints_failed: 0
+
+ats_patterns:
+  - provider: greenhouse
+    detect_from:
+      - "job-boards.greenhouse.io/{board}"
+      - "boards.greenhouse.io/{board}"
+    public_api_pattern: "https://boards-api.greenhouse.io/v1/boards/{board}/jobs?content=true"
+    job_url_field: absolute_url
+    job_id_field: id
+    date_fields:
+      - updated_at
+    v1_status: supported
+  - provider: greenhouse_eu
+    detect_from:
+      - "job-boards.eu.greenhouse.io/{board}"
+    public_api_pattern: "Validate per board; global Greenhouse API host often works for EU-hosted boards."
+    job_url_field: absolute_url
+    job_id_field: id
+    date_fields:
+      - updated_at
+    v1_status: supported_after_validation
+  - provider: ashby
+    detect_from:
+      - "jobs.ashbyhq.com/{board}"
+    public_api_pattern: "https://api.ashbyhq.com/posting-api/job-board/{board}?includeCompensation=true"
+    job_url_field: jobUrl
+    job_id_field: id
+    date_fields:
+      - publishedAt
+      - updatedAt
+    v1_status: supported
+  - provider: lever
+    detect_from:
+      - "jobs.lever.co/{site}"
+    public_api_pattern: "https://api.lever.co/v0/postings/{site}?mode=json"
+    job_url_field: hostedUrl
+    fallback_url_field: applyUrl
+    job_id_field: id
+    date_fields:
+      - createdAt
+    v1_status: supported
+  - provider: lever_eu
+    detect_from:
+      - "jobs.eu.lever.co/{site}"
+    public_api_pattern: "https://api.eu.lever.co/v0/postings/{site}?mode=json"
+    job_url_field: hostedUrl
+    fallback_url_field: applyUrl
+    job_id_field: id
+    date_fields:
+      - createdAt
+    v1_status: supported
+  - provider: smartrecruiters
+    detect_from:
+      - "careers.smartrecruiters.com/{company}"
+    public_api_pattern: "https://api.smartrecruiters.com/v1/companies/{company}/postings"
+    job_url_field: jobAdUrl
+    job_id_field: id
+    date_fields:
+      - postedDate
+    v1_status: backlog
+  - provider: personio
+    detect_from:
+      - "{company}.jobs.personio.de"
+    public_api_pattern: "https://{company}.jobs.personio.de/search.json"
+    job_url_field: url
+    job_id_field: id
+    date_fields: []
+    v1_status: backlog
+  - provider: recruitee
+    detect_from:
+      - "{company}.recruitee.com"
+    public_api_pattern: "https://{company}.recruitee.com/api/offers"
+    job_url_field: careers_url
+    job_id_field: id
+    date_fields:
+      - created_at
+    v1_status: backlog
+  - provider: workable
+    detect_from:
+      - "apply.workable.com/{company}"
+    public_api_pattern: "https://apply.workable.com/api/v1/widget/accounts/{company}"
+    job_url_field: url
+    job_id_field: id
+    date_fields:
+      - published_on
+    v1_status: backlog
+  - provider: teamtailor
+    detect_from:
+      - "Teamtailor-powered career pages"
+    public_api_pattern: "Usually token-gated; browser/XML fallback may be required."
+    job_url_field: varies
+    job_id_field: id
+    date_fields:
+      - created-at
+    v1_status: backlog
+  - provider: workday
+    detect_from:
+      - "myworkdayjobs.com"
+    public_api_pattern: "Deployment-specific and often blocked."
+    job_url_field: varies
+    job_id_field: varies
+    date_fields: []
+    v1_status: backlog
+  - provider: custom
+    detect_from:
+      - "Proprietary career pages"
+    public_api_pattern: "Browser and network discovery required."
+    job_url_field: varies
+    job_id_field: varies
+    date_fields: []
+    v1_status: backlog
+
+deduplication:
+  preferred_keys:
+    - "provider + ats_slug + provider_job_id"
+    - "canonical job URL after tracking-parameter removal"
+    - "normalized company + normalized title + normalized location"
+  canonical_url_rules:
+    remove_tracking_params:
+      - utm_source
+      - utm_medium
+      - utm_campaign
+      - utm_term
+      - utm_content
+      - gh_src
+      - lever-source
+      - source
+  stale_listing_rules:
+    - "Drop or flag listings older than max_age_days when provider date fields exist."
+    - "Mark jobs missing from a full provider sync as closed or stale."
+
+company_index:
+  api_ready:
+    - { name: "Aleph Alpha", provider: ashby, slug: "AlephAlpha", confidence: high }
+    - { name: "DeepL", provider: ashby, slug: "DeepL", confidence: high }
+    - { name: "Black Forest Labs", provider: greenhouse, slug: "blackforestlabs", confidence: high }
+    - { name: "Helsing", provider: greenhouse, slug: "helsing", confidence: medium }
+    - { name: "Parloa", provider: greenhouse, slug: "parloa", confidence: high }
+    - { name: "Langfuse", provider: ashby, slug: "langfuse", confidence: high }
+    - { name: "Lakera", provider: ashby, slug: "lakera.ai", confidence: high }
+    - { name: "n8n", provider: ashby, slug: "n8n", confidence: high }
+    - { name: "Contentful", provider: greenhouse, slug: "contentful", confidence: high }
+    - { name: "Celonis", provider: greenhouse, slug: "celonis", confidence: medium }
+    - { name: "Taxfix", provider: ashby, slug: "taxfix.com", confidence: high }
+    - { name: "N26", provider: greenhouse, slug: "n26", confidence: medium }
+    - { name: "Trade Republic", provider: greenhouse, slug: "traderepublic", confidence: medium }
+    - { name: "Raisin", provider: greenhouse, slug: "raisin", confidence: high }
+    - { name: "GetYourGuide", provider: greenhouse, slug: "getyourguide", confidence: high }
+    - { name: "HelloFresh", provider: greenhouse, slug: "hellofresh", confidence: high }
+    - { name: "Scout24", provider: greenhouse, slug: "autoscout24", confidence: high }
+    - { name: "IDnow", provider: greenhouse, slug: "idnow", confidence: high }
+    - { name: "Vercel", provider: greenhouse, slug: "vercel", confidence: high }
+    - { name: "Supabase", provider: ashby, slug: "supabase", confidence: medium }
+    - { name: "OpenAI", provider: ashby, slug: "openai", confidence: high }
+    - { name: "Anthropic", provider: greenhouse, slug: "anthropic", confidence: high }
+    - { name: "Cohere", provider: ashby, slug: "cohere", confidence: high }
+    - { name: "Pinecone", provider: ashby, slug: "pinecone", confidence: high }
+    - { name: "ElevenLabs", provider: ashby, slug: "elevenlabs", confidence: high }
+    - { name: "Synthesia", provider: ashby, slug: "synthesia", confidence: high }
+    - { name: "Perplexity", provider: ashby, slug: "perplexity", confidence: high }
+    - { name: "Miro", provider: greenhouse, slug: "realtimeboardglobal", confidence: high }
+    - { name: "Upvest", provider: ashby, slug: "upvest", confidence: high }
+    - { name: "Clarisights", provider: ashby, slug: "clarisights", confidence: high }
+    - { name: "Lovehoney Group", provider: lever, slug: "lovehoneygroup", confidence: high }
+    - { name: "Sport Alliance", provider: lever, slug: "sportalliance", confidence: high }
+    - { name: "Saviynt", provider: lever, slug: "saviynt", confidence: high }
+    - { name: "Datapao", provider: greenhouse, slug: "datapao", confidence: high }
+  backlog:
+    - { name: "sennder", detected_provider: smartrecruiters, priority: high }
+    - { name: "Delivery Hero", detected_provider: custom, priority: high }
+    - { name: "SumUp", detected_provider: custom, priority: high }
+    - { name: "Forto", detected_provider: custom, priority: high }
+    - { name: "Personio", detected_provider: personio_custom, priority: high }
+    - { name: "Zalando", detected_provider: workday, priority: high }
+    - { name: "Mistral AI", detected_provider: custom, priority: medium }
+    - { name: "Weights & Biases", detected_provider: unknown, priority: medium }
+    - { name: "Cognigy", detected_provider: softgarden, priority: medium }
+    - { name: "Pitch", detected_provider: custom, priority: medium }
+
+conflict_resolutions:
+  - subject: "Weights & Biases"
+    decision: "Move to backlog."
+    reason: "Research suggested public Greenhouse or Lever access, but tested public API paths returned 404 on 2026-04-19."
+  - subject: "Datapao"
+    decision: "Keep API-ready with validated global Greenhouse API host."
+    reason: "Research suggested the EU API host, but the working public endpoint is boards-api.greenhouse.io."
+  - subject: "Helsing, Celonis, Supabase"
+    decision: "Keep API-ready with medium confidence where the endpoint validated."
+    reason: "Research sources disagreed on visible career surface/provider."
+  - subject: "SmartRecruiters, Workday, Softgarden, Personio, custom pages"
+    decision: "Keep in backlog unless a v1-compatible public API endpoint is verified."
+    reason: "These providers need separate parsing, browser discovery, or stronger stale-link handling."

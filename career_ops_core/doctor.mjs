@@ -5,7 +5,7 @@
  * Checks all prerequisites and prints a pass/fail checklist.
  */
 
-import { existsSync, mkdirSync, readdirSync } from 'fs';
+import { copyFileSync, existsSync, mkdirSync, readdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -63,8 +63,18 @@ async function checkPlaywright() {
 }
 
 function checkUserPreferences() {
-  if (existsSync(join(projectRoot, 'config', 'user-preferences.yml'))) {
+  const target = join(projectRoot, 'config', 'user-preferences.yml');
+  const example = join(projectRoot, 'config', 'user-preferences.example.yml');
+  if (existsSync(target)) {
     return { pass: true, label: 'config/user-preferences.yml found' };
+  }
+  if (existsSync(example)) {
+    try {
+      copyFileSync(example, target);
+      return { pass: true, label: 'config/user-preferences.yml created from example' };
+    } catch {
+      // Fall through to the actionable failure below.
+    }
   }
   return {
     pass: false,
@@ -77,8 +87,18 @@ function checkUserPreferences() {
 }
 
 function checkProfile() {
-  if (existsSync(join(projectRoot, 'config', 'profile.yml'))) {
+  const target = join(projectRoot, 'config', 'profile.yml');
+  const example = join(projectRoot, 'config', 'profile.example.yml');
+  if (existsSync(target)) {
     return { pass: true, label: 'config/profile.yml found' };
+  }
+  if (existsSync(example)) {
+    try {
+      copyFileSync(example, target);
+      return { pass: true, label: 'config/profile.yml created from example' };
+    } catch {
+      // Fall through to the actionable failure below.
+    }
   }
   return {
     pass: false,
@@ -95,12 +115,8 @@ function checkPortals() {
     return { pass: true, label: 'portals.yml found' };
   }
   return {
-    pass: false,
-    label: 'portals.yml not found',
-    fix: [
-      'Run: npm run portals:build',
-      'Build portals from user preferences and accepted companies',
-    ],
+    pass: true,
+    label: 'portals.yml not found yet (created after onboarding with npm run portals:build)',
   };
 }
 

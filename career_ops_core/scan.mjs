@@ -32,6 +32,8 @@ mkdirSync('data', { recursive: true });
 
 const CONCURRENCY = 10;
 const FETCH_TIMEOUT_MS = 10_000;
+const LINK_VALIDATION_TIMEOUT_MS = 5_000;
+const MISSING_LINK_STATUSES = new Set([404, 410]);
 
 // ── API parsers ─────────────────────────────────────────────────────
 
@@ -41,7 +43,8 @@ function parseGreenhouse(json, companyName) {
     title: j.title || '',
     url: j.absolute_url || '',
     company: companyName,
-    location: j.location?.name || '',
+    location: formatLocation(j.location),
+    postedAt: j.updated_at || j.published_at || j.first_published || j.created_at || '',
   }));
 }
 
@@ -51,7 +54,8 @@ function parseAshby(json, companyName) {
     title: j.title || '',
     url: j.jobUrl || '',
     company: companyName,
-    location: j.location || '',
+    location: formatLocation(j.location || j.locationName || j.locations),
+    postedAt: j.publishedAt || j.updatedAt || j.createdAt || '',
   }));
 }
 
@@ -59,13 +63,24 @@ function parseLever(json, companyName) {
   if (!Array.isArray(json)) return [];
   return json.map(j => ({
     title: j.text || '',
-    url: j.hostedUrl || '',
+    url: j.hostedUrl || j.applyUrl || '',
     company: companyName,
-    location: j.categories?.location || '',
+    location: formatLocation(j.categories?.location || j.workplaceType || j.location),
+    postedAt: j.createdAt || '',
   }));
 }
 
 const PARSERS = { greenhouse: parseGreenhouse, ashby: parseAshby, lever: parseLever };
+
+function formatLocation(location) {
+  if (!location) return '';
+  if (typeof location === 'string') return location;
+  if (Array.isArray(location)) return location.map(formatLocation).filter(Boolean).join(', ');
+  if (typeof location === 'object') {
+    return location.name || location.locationName || location.city || location.country || location.region || '';
+  }
+  return String(location);
+}
 
 // ── Fetch with timeout ──────────────────────────────────────────────
 
@@ -84,32 +99,217 @@ async function fetchJson(url) {
 // ── Title filter ────────────────────────────────────────────────────
 
 function buildTitleFilter(titleFilter) {
-  const positive = (titleFilter?.positive || []).map(k => k.toLowerCase());
-  const negative = (titleFilter?.negative || []).map(k => k.toLowerCase());
+  const positive = titleFilter?.positive || [];
+  const negative = titleFilter?.negative || [];
 
   return (title) => {
-    const lower = title.toLowerCase();
-    const hasPositive = positive.length === 0 || positive.some(k => lower.includes(k));
-    const hasNegative = negative.some(k => lower.includes(k));
+    const hasPositive = positive.length === 0 || positive.some(k => keywordMatches(title, k));
+    const hasNegative = negative.some(k => keywordMatches(title, k));
     return hasPositive && !hasNegative;
   };
 }
 
+function normalizeMatchText(value = '') {
+  return String(value || '')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function keywordMatches(value = '', keyword = '') {
+  const normalizedValue = normalizeMatchText(value);
+  const normalizedKeyword = normalizeMatchText(keyword);
+  if (!normalizedValue || !normalizedKeyword) return false;
+
+  return ` ${normalizedValue} `.includes(` ${normalizedKeyword} `);
+}
+
+const GENERIC_LOCATION_TERMS = new Set([
+  'hybrid',
+  'on site',
+  'onsite',
+  'remote',
+]);
+
+function isGenericLocationTerm(term = '') {
+  return GENERIC_LOCATION_TERMS.has(normalizeMatchText(term));
+}
+
 function buildLocationFilter(locationFilter) {
-  const include = (locationFilter?.include || []).map(k => k.toLowerCase());
-  const exclude = (locationFilter?.exclude || []).map(k => k.toLowerCase());
+  const include = locationFilter?.include || [];
+  const exclude = locationFilter?.exclude || [];
+  const geographicInclude = include.filter(term => !isGenericLocationTerm(term));
 
   return (location = '') => {
     if (include.length === 0 && exclude.length === 0) return true;
 
-    const lower = String(location || '').toLowerCase();
-    if (exclude.some(k => lower.includes(k))) return false;
+    if (exclude.some(k => keywordMatches(location, k))) return false;
     if (include.length === 0) return true;
-    return include.some(k => lower.includes(k));
+
+    if (geographicInclude.length > 0) {
+      return geographicInclude.some(k => keywordMatches(location, k));
+    }
+
+    return include.some(k => keywordMatches(location, k));
   };
 }
 
+function buildFreshnessFilter(freshness = {}) {
+  const maxAgeDays = Number(freshness.max_age_days ?? freshness.max_job_age_days ?? 60);
+  if (!Number.isFinite(maxAgeDays) || maxAgeDays <= 0) return () => true;
+
+  const now = new Date();
+  const maxAgeMs = maxAgeDays * 24 * 60 * 60 * 1000;
+
+  return (postedAt) => {
+    if (!postedAt) return true;
+    const postedDate = parsePostedDate(postedAt);
+    if (!postedDate) return true;
+    return now.getTime() - postedDate.getTime() <= maxAgeMs;
+  };
+}
+
+function parsePostedDate(value) {
+  if (value === null || value === undefined || value === '') return null;
+  if (typeof value === 'number') {
+    const ms = value > 10_000_000_000 ? value : value * 1000;
+    const date = new Date(ms);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+  const date = new Date(String(value));
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function buildLinkValidator(linkValidation = {}) {
+  if (linkValidation.enabled !== true) return async () => true;
+
+  const missingStatuses = new Set(linkValidation.reject_statuses || [...MISSING_LINK_STATUSES]);
+  return async (url) => validateJobLink(url, missingStatuses);
+}
+
+async function validateJobLink(url, missingStatuses = MISSING_LINK_STATUSES) {
+  let parsed;
+  try {
+    parsed = new URL(String(url || '').trim());
+  } catch {
+    return false;
+  }
+
+  if (!['http:', 'https:'].includes(parsed.protocol)) return false;
+
+  const headStatus = await fetchStatus(parsed.toString(), 'HEAD');
+  if (missingStatuses.has(headStatus)) return false;
+  if (headStatus === 405 || headStatus === 501) {
+    const getStatus = await fetchStatus(parsed.toString(), 'GET');
+    return !missingStatuses.has(getStatus);
+  }
+
+  return true;
+}
+
+async function fetchStatus(url, method) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), LINK_VALIDATION_TIMEOUT_MS);
+  try {
+    const res = await fetch(url, {
+      method,
+      redirect: 'follow',
+      signal: controller.signal,
+    });
+    return res.status;
+  } catch {
+    // Do not drop jobs on transient network or bot-protection failures.
+    return 0;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 // ── Dedup ───────────────────────────────────────────────────────────
+
+function canonicalizeJobUrl(rawUrl = '') {
+  let parsed;
+  try {
+    parsed = new URL(String(rawUrl).trim());
+  } catch {
+    return String(rawUrl || '').trim();
+  }
+
+  parsed.hash = '';
+  parsed.hostname = parsed.hostname.toLowerCase();
+  const trackingParams = [
+    'gh_src',
+    'source',
+    'utm_campaign',
+    'utm_content',
+    'utm_medium',
+    'utm_source',
+    'utm_term',
+  ];
+  for (const param of trackingParams) parsed.searchParams.delete(param);
+
+  const sortedParams = [...parsed.searchParams.entries()].sort(([a], [b]) => a.localeCompare(b));
+  parsed.search = '';
+  for (const [key, value] of sortedParams) parsed.searchParams.append(key, value);
+
+  return parsed.toString().replace(/\/$/, '');
+}
+
+function normalizeCompany(name = '') {
+  return String(name).toLowerCase()
+    .replace(/[()]/g, '')
+    .replace(/\b(inc|llc|ltd|corp|corporation|technologies|technology|group|co)\b\.?/g, '')
+    .replace(/[^a-z0-9 ]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function normalizeRole(role = '') {
+  return String(role).toLowerCase()
+    .replace(/[()]/g, ' ')
+    .replace(/[^a-z0-9 /-]/g, ' ')
+    .replace(/[-/]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+const ROLE_STOPWORDS = new Set([
+  'senior', 'junior', 'lead', 'staff', 'principal', 'head', 'chief',
+  'manager', 'director', 'associate', 'intern', 'contractor',
+  'remote', 'hybrid', 'onsite',
+]);
+
+const LOCATION_STOPWORDS = new Set([
+  'berlin', 'germany', 'munich', 'hamburg', 'tokyo', 'japan', 'london',
+  'paris', 'singapore', 'york', 'francisco', 'angeles', 'seattle',
+  'austin', 'boston', 'chicago', 'denver', 'toronto', 'amsterdam',
+  'dublin', 'sydney', 'global', 'emea', 'apac', 'latam',
+]);
+
+function roleFuzzyMatch(a, b) {
+  const terms = (role) => normalizeRole(role)
+    .split(/\s+/)
+    .filter(w => w.length > 1 && !ROLE_STOPWORDS.has(w) && !LOCATION_STOPWORDS.has(w));
+
+  const wordsA = terms(a);
+  const wordsB = terms(b);
+  if (wordsA.length === 0 || wordsB.length === 0) return false;
+
+  const overlap = wordsA.filter(w => wordsB.some(wb => wb === w || wb.includes(w) || w.includes(wb)));
+  const smaller = Math.min(wordsA.length, wordsB.length);
+  return overlap.length >= 2 && overlap.length / smaller >= 0.6;
+}
+
+function hasSeenCompanyRole(seenCompanyRoles, company, role) {
+  const normCompany = normalizeCompany(company);
+  return seenCompanyRoles.some((seen) =>
+    seen.company === normCompany && (seen.role === normalizeRole(role) || roleFuzzyMatch(seen.role, role))
+  );
+}
 
 function loadSeenUrls() {
   const seen = new Set();
@@ -119,7 +319,7 @@ function loadSeenUrls() {
     const lines = readFileSync(SCAN_HISTORY_PATH, 'utf-8').split('\n');
     for (const line of lines.slice(1)) { // skip header
       const url = line.split('\t')[0];
-      if (url) seen.add(url);
+      if (url) seen.add(canonicalizeJobUrl(url));
     }
   }
 
@@ -127,7 +327,7 @@ function loadSeenUrls() {
   if (existsSync(PIPELINE_PATH)) {
     const text = readFileSync(PIPELINE_PATH, 'utf-8');
     for (const match of text.matchAll(/- \[[ x]\] (https?:\/\/\S+)/g)) {
-      seen.add(match[1]);
+      seen.add(canonicalizeJobUrl(match[1]));
     }
   }
 
@@ -135,7 +335,7 @@ function loadSeenUrls() {
   if (existsSync(APPLICATIONS_PATH)) {
     const text = readFileSync(APPLICATIONS_PATH, 'utf-8');
     for (const match of text.matchAll(/https?:\/\/[^\s|)]+/g)) {
-      seen.add(match[0]);
+      seen.add(canonicalizeJobUrl(match[0]));
     }
   }
 
@@ -143,15 +343,29 @@ function loadSeenUrls() {
 }
 
 function loadSeenCompanyRoles() {
-  const seen = new Set();
+  const seen = [];
+
+  if (existsSync(PIPELINE_PATH)) {
+    const text = readFileSync(PIPELINE_PATH, 'utf-8');
+    for (const match of text.matchAll(/- \[[ x]\] (?:https?:\/\/\S+|local:\S+)\s+\|\s*([^|]+)\s+\|\s*([^\n|]+)/g)) {
+      const company = normalizeCompany(match[1]);
+      const role = normalizeRole(match[2]);
+      if (company && role) seen.push({ company, role });
+    }
+  }
+
   if (existsSync(APPLICATIONS_PATH)) {
     const text = readFileSync(APPLICATIONS_PATH, 'utf-8');
-    // Parse markdown table rows: | # | Date | Company | Role | ...
-    for (const match of text.matchAll(/\|[^|]+\|[^|]+\|\s*([^|]+)\s*\|\s*([^|]+)\s*\|/g)) {
-      const company = match[1].trim().toLowerCase();
-      const role = match[2].trim().toLowerCase();
-      if (company && role && company !== 'company') {
-        seen.add(`${company}::${role}`);
+    for (const line of text.split('\n')) {
+      if (!line.trim().startsWith('|') || line.includes('---')) continue;
+      const parts = line.split('|').map(part => part.trim());
+      if (parts.length < 5) continue;
+      const entryNumber = Number.parseInt(parts[1], 10);
+      if (!Number.isFinite(entryNumber)) continue;
+      const company = normalizeCompany(parts[3]);
+      const role = normalizeRole(parts[4]);
+      if (company && role && company !== 'company' && role !== 'role') {
+        seen.push({ company, role });
       }
     }
   }
@@ -243,6 +457,8 @@ async function main() {
   const discoveryBacklog = config.discovery_backlog || [];
   const titleFilter = buildTitleFilter(config.title_filter);
   const locationFilter = buildLocationFilter(config.location_filter);
+  const freshnessFilter = buildFreshnessFilter(config.freshness);
+  const linkValidator = buildLinkValidator(config.link_validation);
 
   // 2. Filter to enabled companies with detectable APIs
   const targets = companies
@@ -279,6 +495,8 @@ async function main() {
   let totalFound = 0;
   let totalFiltered = 0;
   let totalLocationFiltered = 0;
+  let totalAgeFiltered = 0;
+  let totalInvalidLinks = 0;
   let totalDupes = 0;
   const newOffers = [];
   const errors = [];
@@ -299,19 +517,27 @@ async function main() {
           totalLocationFiltered++;
           continue;
         }
-        if (seenUrls.has(job.url)) {
+        if (!freshnessFilter(job.postedAt)) {
+          totalAgeFiltered++;
+          continue;
+        }
+        const canonicalUrl = canonicalizeJobUrl(job.url);
+        if (!canonicalUrl || seenUrls.has(canonicalUrl)) {
           totalDupes++;
           continue;
         }
-        const key = `${job.company.toLowerCase()}::${job.title.toLowerCase()}`;
-        if (seenCompanyRoles.has(key)) {
+        if (hasSeenCompanyRole(seenCompanyRoles, job.company, job.title)) {
           totalDupes++;
+          continue;
+        }
+        if (!(await linkValidator(canonicalUrl))) {
+          totalInvalidLinks++;
           continue;
         }
         // Mark as seen to avoid intra-scan dupes
-        seenUrls.add(job.url);
-        seenCompanyRoles.add(key);
-        newOffers.push({ ...job, source: `${type}-api` });
+        seenUrls.add(canonicalUrl);
+        seenCompanyRoles.push({ company: normalizeCompany(job.company), role: normalizeRole(job.title) });
+        newOffers.push({ ...job, url: canonicalUrl, source: `${type}-api` });
       }
     } catch (err) {
       errors.push({ company: company.name, error: err.message });
@@ -334,6 +560,8 @@ async function main() {
   console.log(`Total jobs found:      ${totalFound}`);
   console.log(`Filtered by title:     ${totalFiltered} removed`);
   console.log(`Filtered by location:  ${totalLocationFiltered} removed`);
+  console.log(`Filtered by age:       ${totalAgeFiltered} removed`);
+  console.log(`Invalid links:         ${totalInvalidLinks} removed`);
   console.log(`Duplicates:            ${totalDupes} skipped`);
   console.log(`New offers added:      ${newOffers.length}`);
 
@@ -345,7 +573,7 @@ async function main() {
   }
 
   if (discoveryBacklog.length > 0 || searchQueries.length > 0) {
-    console.log(`\nHybrid discovery backlog: ${discoveryBacklog.length} unsupported compan${discoveryBacklog.length === 1 ? 'y' : 'ies'}, ${searchQueries.length} Codex query${searchQueries.length === 1 ? '' : 'ies'}.`);
+    console.log(`\nHybrid discovery backlog: ${discoveryBacklog.length} unsupported compan${discoveryBacklog.length === 1 ? 'y' : 'ies'}, ${searchQueries.length} Codex quer${searchQueries.length === 1 ? 'y' : 'ies'}.`);
   }
 
   if (newOffers.length > 0) {
