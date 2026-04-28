@@ -13,6 +13,8 @@
     "portals:build": "node career_ops_core/build-portals.mjs",
     "scan": "node career_ops_core/scan.mjs",
     "scan:dry": "node career_ops_core/scan.mjs --dry-run",
+    "scan:all": "node career_ops_core/scan-all.mjs",
+    "discover:browser": "node career_ops_core/browser-discover.mjs",
     "score": "node career_ops_core/score-opportunity.mjs",
     "pdf": "node career_ops_core/generate-pdf.mjs",
     "sync-check": "node career_ops_core/cv-sync-check.mjs",
@@ -37,5 +39,8 @@
     "pdf-parse": "^1.1.1",
     "playwright": "^1.58.1",
     "tesseract.js": "^5.1.1"
+  },
+  "overrides": {
+    "@xmldom/xmldom": "^0.8.13"
   }
 }

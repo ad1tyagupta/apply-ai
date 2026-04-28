@@ -64,6 +64,11 @@ test("buildPortalsConfig merges preferences with accepted companies and role key
   assert.deepEqual(config.location_filter.exclude, ["United States"]);
   assert.equal(config.metadata.market, "default");
   assert.equal(config.freshness.max_age_days, 60);
+  assert.deepEqual(config.browser_discovery, {
+    enabled: true,
+    max_queries: 2,
+    max_backlog_companies: 5,
+  });
   assert.equal(config.tracked_companies.length, 1);
   assert.equal(config.tracked_companies[0].name, "Notion");
   assert.equal(config.tracked_companies[0].ats_provider, "ashby");

@@ -175,6 +175,11 @@ export function buildPortalsConfig({
       enabled: true,
       reject_statuses: [404, 410],
     },
+    browser_discovery: {
+      enabled: true,
+      max_queries: preferences.discovery?.browserMaxQueries || 2,
+      max_backlog_companies: preferences.discovery?.browserMaxBacklogCompanies || 5,
+    },
     tracked_companies: trackedCompanies,
     discovery_backlog: discoveryBacklog,
     search_queries: searchQueries,
